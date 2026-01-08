@@ -3,8 +3,9 @@
 
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
-  // Using dummy audio URLs - can be replaced with actual Quran recitation URLs
-  const audioUrl = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${surahNumber % 10 || 10}.mp3`;
+  // Using audio files from audio_files folder, cycling through the 9 available files
+  const audioFileNumber = ((surahNumber - 1) % 9) + 1;
+  const audioUrl = `/audio_files/audio${audioFileNumber}.mp3`;
   
   return {
     id: surahNumber,
