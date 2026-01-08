@@ -33,8 +33,16 @@ function App() {
         setProgress(0);
         if (currentSurahRef.current) {
           const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
-          const nextIndex = (currentIndex + 1) % surahs.length;
-          setCurrentSurah(surahs[nextIndex]);
+          // Find next surah with audio
+          let nextIndex = (currentIndex + 1) % surahs.length;
+          let attempts = 0;
+          while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+            nextIndex = (nextIndex + 1) % surahs.length;
+            attempts++;
+          }
+          if (surahs[nextIndex].audioUrl) {
+            setCurrentSurah(surahs[nextIndex]);
+          }
         }
       });
       
@@ -52,7 +60,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (currentSurah && audioRef.current) {
+    if (currentSurah && audioRef.current && currentSurah.audioUrl) {
       audioRef.current.src = currentSurah.audioUrl;
       audioRef.current.load();
       setProgress(0);
@@ -66,7 +74,9 @@ function App() {
   }, [currentSurah]);
 
   const handleSurahSelect = (surah) => {
-    setCurrentSurah(surah);
+    if (surah.audioUrl) {
+      setCurrentSurah(surah);
+    }
   };
 
   const handlePlayPause = () => {
@@ -87,15 +97,31 @@ function App() {
   const handleNext = () => {
     if (!currentSurah) return;
     const currentIndex = surahs.findIndex(s => s.id === currentSurah.id);
-    const nextIndex = (currentIndex + 1) % surahs.length;
-    setCurrentSurah(surahs[nextIndex]);
+    // Find next surah with audio
+    let nextIndex = (currentIndex + 1) % surahs.length;
+    let attempts = 0;
+    while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+      nextIndex = (nextIndex + 1) % surahs.length;
+      attempts++;
+    }
+    if (surahs[nextIndex].audioUrl) {
+      setCurrentSurah(surahs[nextIndex]);
+    }
   };
 
   const handlePrevious = () => {
     if (!currentSurah) return;
     const currentIndex = surahs.findIndex(s => s.id === currentSurah.id);
-    const prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
-    setCurrentSurah(surahs[prevIndex]);
+    // Find previous surah with audio
+    let prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
+    let attempts = 0;
+    while (!surahs[prevIndex].audioUrl && attempts < surahs.length) {
+      prevIndex = prevIndex === 0 ? surahs.length - 1 : prevIndex - 1;
+      attempts++;
+    }
+    if (surahs[prevIndex].audioUrl) {
+      setCurrentSurah(surahs[prevIndex]);
+    }
   };
 
   useEffect(() => {
@@ -125,14 +151,30 @@ function App() {
           break;
         case 'ArrowRight': {
           const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
-          const nextIndex = (currentIndex + 1) % surahs.length;
-          setCurrentSurah(surahs[nextIndex]);
+          // Find next surah with audio
+          let nextIndex = (currentIndex + 1) % surahs.length;
+          let attempts = 0;
+          while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+            nextIndex = (nextIndex + 1) % surahs.length;
+            attempts++;
+          }
+          if (surahs[nextIndex].audioUrl) {
+            setCurrentSurah(surahs[nextIndex]);
+          }
           break;
         }
         case 'ArrowLeft': {
           const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
-          const prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
-          setCurrentSurah(surahs[prevIndex]);
+          // Find previous surah with audio
+          let prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
+          let attempts = 0;
+          while (!surahs[prevIndex].audioUrl && attempts < surahs.length) {
+            prevIndex = prevIndex === 0 ? surahs.length - 1 : prevIndex - 1;
+            attempts++;
+          }
+          if (surahs[prevIndex].audioUrl) {
+            setCurrentSurah(surahs[prevIndex]);
+          }
           break;
         }
         default:
