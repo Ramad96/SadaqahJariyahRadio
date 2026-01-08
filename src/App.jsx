@@ -3,7 +3,7 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.0.3';
+const VERSION = '1.0.4';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
