@@ -18,8 +18,13 @@ const surahNames = [
 
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
-  // Only assign audio files to the first 9 surahs
-  const audioUrl = surahNumber <= 9 ? `/audio_files/audio${surahNumber}.mp3` : null;
+  // Assign audio files: first 9 surahs use audio1-9, surah 112 (Al-Ikhlas) uses surah-iklas
+  let audioUrl = null;
+  if (surahNumber <= 9) {
+    audioUrl = `/audio_files/audio${surahNumber}.mp3`;
+  } else if (surahNumber === 112) {
+    audioUrl = `/audio_files/surah-iklas.mp3`;
+  }
   
   return {
     id: surahNumber,

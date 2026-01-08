@@ -3,8 +3,15 @@ import { Play, Search } from 'lucide-react';
 
 export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(false);
 
   const filteredSurahs = surahs.filter((surah) => {
+    // Filter by audio availability if checkbox is checked
+    if (showOnlyWithAudio && !surah.audioUrl) {
+      return false;
+    }
+    
+    // Filter by search query
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -34,6 +41,18 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
+          </div>
+          <div className="mb-4 flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="showOnlyWithAudio"
+              checked={showOnlyWithAudio}
+              onChange={(e) => setShowOnlyWithAudio(e.target.checked)}
+              className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
+            />
+            <label htmlFor="showOnlyWithAudio" className="text-sm text-slate-300 cursor-pointer select-none">
+              Show only surahs with audio
+            </label>
           </div>
           <div className="h-[380px] overflow-y-auto">
             <div className="space-y-2">
