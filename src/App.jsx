@@ -3,6 +3,8 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
+const VERSION = '1.0.0';
+
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,6 +13,10 @@ function App() {
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
+  
+  useEffect(() => {
+    document.title = `Quran Radio Station v${VERSION}`;
+  }, []);
   
   useEffect(() => {
     currentSurahRef.current = currentSurah;
@@ -196,6 +202,7 @@ function App() {
         onPrevious={handlePrevious}
         progress={progress}
         duration={duration}
+        version={VERSION}
       />
       
       <SurahLibrary
