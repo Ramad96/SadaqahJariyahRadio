@@ -6,13 +6,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
       <div className="max-w-md mx-auto space-y-6">
         <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl">
           <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase text-center mb-2">
-            Quran Radio
+            Sadaqah Jariyah Radio
           </h1>
           <p className="text-slate-500 text-xs text-center">Select a Surah to begin listening</p>
         </div>
         
-        <div className="space-y-2">
-          {surahs.map((surah) => {
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4 h-[426px] overflow-y-auto">
+          <div className="space-y-2">
+            {surahs.map((surah) => {
             const isActive = currentSurah?.id === surah.id;
             const hasAudio = surah.audioUrl !== null;
             
@@ -81,6 +82,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
               </button>
             );
           })}
+          </div>
         </div>
       </div>
     </main>

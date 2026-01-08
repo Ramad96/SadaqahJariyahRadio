@@ -56,7 +56,7 @@ export default function Balcony({
 
           {/* Right: Title */}
           <div className="flex-shrink-0">
-            <span className="text-white font-bold text-base">Quran Radio</span>
+            <span className="text-white font-bold text-base">Sadaqah Jariyah Radio</span>
             <span className="text-white/80 font-normal text-xs ml-2">v{version}</span>
           </div>
         </div>

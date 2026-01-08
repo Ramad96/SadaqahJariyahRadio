@@ -3,7 +3,7 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -15,7 +15,7 @@ function App() {
   const currentSurahRef = useRef(null);
   
   useEffect(() => {
-    document.title = `Quran Radio Station v${VERSION}`;
+    document.title = `Sadaqah Jariyah Radio Station v${VERSION}`;
   }, []);
   
   useEffect(() => {
