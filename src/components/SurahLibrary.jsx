@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Play, Search, X, Info } from 'lucide-react';
+import { Play, Pause, Search, X, Info } from 'lucide-react';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(false);
+  const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [showAbout, setShowAbout] = useState(false);
 
   const filteredSurahs = surahs.filter((surah) => {
@@ -60,6 +60,9 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
                   The purpose of this website is to listen to Quran recitation of those who have returned to our Creator, and insha'allah this will be sadaqah jariya for them. May Allah accept their ibadah.
                 </p>
                 <p className="text-center font-semibold text-white mt-4">
+                  May Allah accept this as reward for my parents.
+                </p>
+                <p className="text-center font-semibold text-white">
                   In memory of Shiekh Magdi Osman.
                 </p>
               </div>
@@ -78,17 +81,31 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
               className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
-          <div className="mb-4 flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="showOnlyWithAudio"
-              checked={showOnlyWithAudio}
-              onChange={(e) => setShowOnlyWithAudio(e.target.checked)}
-              className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
-            />
-            <label htmlFor="showOnlyWithAudio" className="text-sm text-slate-300 cursor-pointer select-none">
-              Show only surahs with audio
-            </label>
+          <div className="mb-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="showOnlyWithAudio"
+                checked={showOnlyWithAudio}
+                onChange={(e) => setShowOnlyWithAudio(e.target.checked)}
+                className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="showOnlyWithAudio" className="text-sm text-slate-300 cursor-pointer select-none">
+                Show only surahs with audio
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="autoPlayNext"
+                checked={autoPlayNext}
+                onChange={(e) => onAutoPlayNextChange(e.target.checked)}
+                className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="autoPlayNext" className="text-sm text-slate-300 cursor-pointer select-none">
+                Auto play next surah
+              </label>
+            </div>
           </div>
           <div className="h-[380px] overflow-y-auto">
             <div className="space-y-2">
@@ -97,12 +114,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
             const hasAudio = surah.audioUrl !== null;
             
             return (
-              <button
+              <div
                 key={surah.id}
-                onClick={() => hasAudio && onSurahSelect(surah)}
-                disabled={!hasAudio}
                 className={`
-                  w-full p-4 rounded-2xl border-2 text-left transition-all
+                  w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between gap-3
                   ${!hasAudio 
                     ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed' 
                     : isActive 
@@ -110,55 +125,79 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
                       : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-800 hover:border-slate-700'
                   }
                 `}
-                aria-label={hasAudio ? `Play ${surah.name}` : `${surah.name} (No audio available)`}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`
-                        text-[10px] font-bold uppercase tracking-widest
-                        ${isActive ? 'text-indigo-200' : 'text-slate-500'}
-                      `}>
-                        #{surah.number}
-                      </span>
-                      {isActive && (
-                        <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">
-                          • PLAYING
-                        </span>
-                      )}
-                    </div>
-                    <div className={`
-                      font-bold text-sm
-                      ${!hasAudio ? 'text-slate-500' : isActive ? 'text-white' : 'text-white'}
+                <button
+                  onClick={() => hasAudio && onSurahSelect(surah)}
+                  disabled={!hasAudio}
+                  className="flex-1 min-w-0 text-left"
+                  aria-label={hasAudio ? `Select ${surah.name}` : `${surah.name} (No audio available)`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`
+                      text-[10px] font-bold uppercase tracking-widest
+                      ${isActive ? 'text-indigo-200' : 'text-slate-500'}
                     `}>
-                      {surah.name}
-                    </div>
-                    {surah.nameArabic && (
-                      <div className={`
-                        text-xs mt-0.5
-                        ${!hasAudio ? 'text-slate-600' : isActive ? 'text-indigo-100' : 'text-slate-400'}
-                      `}>
-                        {surah.nameArabic}
-                      </div>
+                      #{surah.number}
+                    </span>
+                    {isActive && (
+                      <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">
+                        • PLAYING
+                      </span>
                     )}
                   </div>
                   <div className={`
-                    flex-shrink-0 p-2 rounded-xl
-                    ${!hasAudio 
-                      ? 'bg-slate-700' 
-                      : isActive 
-                        ? 'bg-white/20' 
-                        : 'bg-slate-800'
-                    }
+                    font-bold text-sm
+                    ${!hasAudio ? 'text-slate-500' : isActive ? 'text-white' : 'text-white'}
                   `}>
+                    {surah.name}
+                  </div>
+                  {surah.nameArabic && (
+                    <div className={`
+                      text-xs mt-0.5
+                      ${!hasAudio ? 'text-slate-600' : isActive ? 'text-indigo-100' : 'text-slate-400'}
+                    `}>
+                      {surah.nameArabic}
+                    </div>
+                  )}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (hasAudio) {
+                      if (isActive) {
+                        onPlayPause();
+                      } else {
+                        onSurahSelect(surah);
+                      }
+                    }
+                  }}
+                  disabled={!hasAudio}
+                  className={`
+                    flex-shrink-0 p-2 rounded-xl transition-all
+                    ${!hasAudio 
+                      ? 'bg-slate-700 cursor-not-allowed' 
+                      : isActive 
+                        ? 'bg-white/20 hover:bg-white/30' 
+                        : 'bg-slate-800 hover:bg-slate-700'
+                    }
+                  `}
+                  aria-label={hasAudio ? (isActive && isPlaying ? 'Pause' : 'Play') : 'No audio available'}
+                >
+                  {isActive && isPlaying ? (
+                    <Pause 
+                      size={16} 
+                      className="text-white"
+                      fill="currentColor"
+                    />
+                  ) : (
                     <Play 
                       size={16} 
                       className={!hasAudio ? 'text-slate-600' : isActive ? 'text-white' : 'text-slate-400'}
                       fill={!hasAudio ? 'none' : isActive ? 'currentColor' : 'none'}
                     />
-                  </div>
-                </div>
-              </button>
+                  )}
+                </button>
+              </div>
             );
           })}
             </div>

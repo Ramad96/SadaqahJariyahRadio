@@ -3,16 +3,18 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.0.5';
+const VERSION = '1.0.8';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [autoPlayNext, setAutoPlayNext] = useState(false);
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
+  const autoPlayNextRef = useRef(false);
   
   useEffect(() => {
     document.title = `Sadaqah Jariyah Radio Station v${VERSION}`;
@@ -21,6 +23,10 @@ function App() {
   useEffect(() => {
     currentSurahRef.current = currentSurah;
   }, [currentSurah]);
+
+  useEffect(() => {
+    autoPlayNextRef.current = autoPlayNext;
+  }, [autoPlayNext]);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -37,7 +43,8 @@ function App() {
       audioRef.current.addEventListener('ended', () => {
         setIsPlaying(false);
         setProgress(0);
-        if (currentSurahRef.current) {
+        // Only auto-play next if the option is enabled
+        if (autoPlayNextRef.current && currentSurahRef.current) {
           const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
           // Find next surah with audio
           let nextIndex = (currentIndex + 1) % surahs.length;
@@ -209,6 +216,10 @@ function App() {
         surahs={surahs}
         currentSurah={currentSurah}
         onSurahSelect={handleSurahSelect}
+        autoPlayNext={autoPlayNext}
+        onAutoPlayNextChange={setAutoPlayNext}
+        isPlaying={isPlaying}
+        onPlayPause={handlePlayPause}
       />
     </div>
   );
