@@ -1,6 +1,19 @@
-import { Play } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Search } from 'lucide-react';
 
 export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredSurahs = surahs.filter((surah) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      surah.name.toLowerCase().includes(query) ||
+      surah.number.toString().includes(query) ||
+      (surah.nameArabic && surah.nameArabic.includes(query))
+    );
+  });
+
   return (
     <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">
       <div className="max-w-md mx-auto space-y-6">
@@ -11,9 +24,20 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
           <p className="text-slate-500 text-xs text-center">Select a Surah to begin listening</p>
         </div>
         
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4 h-[426px] overflow-y-auto">
-          <div className="space-y-2">
-            {surahs.map((surah) => {
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search surahs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+          <div className="h-[380px] overflow-y-auto">
+            <div className="space-y-2">
+              {filteredSurahs.map((surah) => {
             const isActive = currentSurah?.id === surah.id;
             const hasAudio = surah.audioUrl !== null;
             
@@ -82,6 +106,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect }) {
               </button>
             );
           })}
+            </div>
           </div>
         </div>
       </div>
