@@ -18,22 +18,32 @@ const surahNames = [
 
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
-  // Assign audio files: first 9 surahs use audio1-9, surah 112 (Al-Ikhlas) uses surah-iklas
   // Using import.meta.env.BASE_URL to ensure correct paths with GitHub Pages base path
   const baseUrl = import.meta.env.BASE_URL;
-  let audioUrl = null;
+  
+  // Define audio options for each surah
+  const audioOptions = [];
+  
+  // Add "Default" option with actual audio files for surahs that have them
   if (surahNumber <= 9) {
-    audioUrl = `${baseUrl}audio_files/audio${surahNumber}.mp3`;
+    audioOptions.push({ name: 'Default', url: `${baseUrl}audio_files/audio${surahNumber}.mp3` });
   } else if (surahNumber === 112) {
-    audioUrl = `${baseUrl}audio_files/surah-iklas.mp3`;
+    audioOptions.push({ name: 'Default', url: `${baseUrl}audio_files/surah-iklas.mp3` });
+  } else {
+    audioOptions.push({ name: 'Default', url: null });
   }
+  
+  // Add "sample_recording" as second option for all surahs
+  audioOptions.push({ name: 'sample_recording', url: `${baseUrl}audio_files/sample_recording.mp3` });
   
   return {
     id: surahNumber,
     number: surahNumber,
     name: `${surahNumber}. ${surahNames[i]}`,
     nameArabic: `سورة ${surahNumber}`, // Placeholder - can be replaced with actual Arabic names
-    audioUrl: audioUrl,
+    audioOptions: audioOptions,
+    // Legacy support - use first option's URL if available
+    audioUrl: audioOptions[0].url,
     // Future-proofing: array for additional clips to be played sequentially
     additionalClips: []
   };

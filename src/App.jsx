@@ -3,7 +3,7 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -12,10 +12,28 @@ function App() {
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [selectedAudio, setSelectedAudio] = useState(() => {
+    // Load from localStorage or default to "Default" for all surahs
+    const saved = localStorage.getItem('selectedAudio');
+    return saved ? JSON.parse(saved) : {};
+  });
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
   const autoPlayNextRef = useRef(false);
+  
+  // Save selected audio to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('selectedAudio', JSON.stringify(selectedAudio));
+  }, [selectedAudio]);
+  
+  // Get the audio URL for a surah based on selected audio option
+  const getSurahAudioUrl = (surah) => {
+    if (!surah || !surah.audioOptions || surah.audioOptions.length === 0) return null;
+    const selectedOptionName = selectedAudio[surah.id] || 'Default';
+    const selectedOption = surah.audioOptions.find(opt => opt.name === selectedOptionName) || surah.audioOptions[0];
+    return selectedOption.url;
+  };
   
   useEffect(() => {
     document.title = `Sadaqah Jariyah Radio Station v${VERSION}`;
@@ -74,22 +92,38 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (currentSurah && audioRef.current && currentSurah.audioUrl) {
-      audioRef.current.src = currentSurah.audioUrl;
-      audioRef.current.load();
-      setProgress(0);
-      
-      audioRef.current.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {
-          setIsPlaying(false);
-        });
+    if (currentSurah && audioRef.current) {
+      const audioUrl = getSurahAudioUrl(currentSurah);
+      if (audioUrl) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.load();
+        setProgress(0);
+        
+        audioRef.current.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            setIsPlaying(false);
+          });
+      }
     }
-  }, [currentSurah]);
+  }, [currentSurah, selectedAudio]);
 
   const handleSurahSelect = (surah) => {
-    if (surah.audioUrl) {
+    const audioUrl = getSurahAudioUrl(surah);
+    if (audioUrl) {
       setCurrentSurah(surah);
+    }
+  };
+  
+  const handleAudioSelect = (surahId, audioName) => {
+    setSelectedAudio(prev => ({
+      ...prev,
+      [surahId]: audioName
+    }));
+    // If this surah is currently playing, update the audio
+    if (currentSurah && currentSurah.id === surahId) {
+      const updatedSurah = { ...currentSurah };
+      setCurrentSurah(updatedSurah);
     }
   };
 
@@ -114,11 +148,13 @@ function App() {
     // Find next surah with audio
     let nextIndex = (currentIndex + 1) % surahs.length;
     let attempts = 0;
-    while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+    let nextAudioUrl = getSurahAudioUrl(surahs[nextIndex]);
+    while (!nextAudioUrl && attempts < surahs.length) {
       nextIndex = (nextIndex + 1) % surahs.length;
       attempts++;
+      nextAudioUrl = getSurahAudioUrl(surahs[nextIndex]);
     }
-    if (surahs[nextIndex].audioUrl) {
+    if (nextAudioUrl) {
       setCurrentSurah(surahs[nextIndex]);
     }
   };
@@ -129,11 +165,13 @@ function App() {
     // Find previous surah with audio
     let prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
     let attempts = 0;
-    while (!surahs[prevIndex].audioUrl && attempts < surahs.length) {
+    let prevAudioUrl = getSurahAudioUrl(surahs[prevIndex]);
+    while (!prevAudioUrl && attempts < surahs.length) {
       prevIndex = prevIndex === 0 ? surahs.length - 1 : prevIndex - 1;
       attempts++;
+      prevAudioUrl = getSurahAudioUrl(surahs[prevIndex]);
     }
-    if (surahs[prevIndex].audioUrl) {
+    if (prevAudioUrl) {
       setCurrentSurah(surahs[prevIndex]);
     }
   };
@@ -168,11 +206,14 @@ function App() {
           // Find next surah with audio
           let nextIndex = (currentIndex + 1) % surahs.length;
           let attempts = 0;
-          while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+          const nextSurah = surahs[nextIndex];
+          let nextAudioUrl = getSurahAudioUrl(nextSurah);
+          while (!nextAudioUrl && attempts < surahs.length) {
             nextIndex = (nextIndex + 1) % surahs.length;
             attempts++;
+            nextAudioUrl = getSurahAudioUrl(surahs[nextIndex]);
           }
-          if (surahs[nextIndex].audioUrl) {
+          if (nextAudioUrl) {
             setCurrentSurah(surahs[nextIndex]);
           }
           break;
@@ -182,11 +223,13 @@ function App() {
           // Find previous surah with audio
           let prevIndex = currentIndex === 0 ? surahs.length - 1 : currentIndex - 1;
           let attempts = 0;
-          while (!surahs[prevIndex].audioUrl && attempts < surahs.length) {
+          let prevAudioUrl = getSurahAudioUrl(surahs[prevIndex]);
+          while (!prevAudioUrl && attempts < surahs.length) {
             prevIndex = prevIndex === 0 ? surahs.length - 1 : prevIndex - 1;
             attempts++;
+            prevAudioUrl = getSurahAudioUrl(surahs[prevIndex]);
           }
-          if (surahs[prevIndex].audioUrl) {
+          if (prevAudioUrl) {
             setCurrentSurah(surahs[prevIndex]);
           }
           break;
@@ -224,6 +267,9 @@ function App() {
         onPlayPause={handlePlayPause}
         showAbout={showAbout}
         onCloseAbout={() => setShowAbout(false)}
+        selectedAudio={selectedAudio}
+        onAudioSelect={handleAudioSelect}
+        getSurahAudioUrl={getSurahAudioUrl}
       />
     </div>
   );

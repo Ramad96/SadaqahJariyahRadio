@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Play, Pause, Search, X } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown } from 'lucide-react';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
+  const [expandedSurah, setExpandedSurah] = useState(null);
 
   const filteredSurahs = surahs.filter((surah) => {
     // Filter by audio availability if checkbox is checked
-    if (showOnlyWithAudio && !surah.audioUrl) {
+    const audioUrl = getSurahAudioUrl(surah);
+    if (showOnlyWithAudio && !audioUrl) {
       return false;
     }
     
@@ -101,13 +103,16 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
             <div className="space-y-2">
               {filteredSurahs.map((surah) => {
             const isActive = currentSurah?.id === surah.id;
-            const hasAudio = surah.audioUrl !== null;
+            const audioUrl = getSurahAudioUrl(surah);
+            const hasAudio = audioUrl !== null;
+            const selectedAudioName = selectedAudio[surah.id] || 'Default';
+            const isExpanded = expandedSurah === surah.id;
             
             return (
               <div
                 key={surah.id}
                 className={`
-                  w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between gap-3
+                  w-full rounded-2xl border-2 transition-all
                   ${!hasAudio 
                     ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed' 
                     : isActive 
@@ -116,6 +121,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   }
                 `}
               >
+                <div className="flex items-center justify-between gap-3 p-4">
                 <button
                   onClick={() => hasAudio && onSurahSelect(surah)}
                   disabled={!hasAudio}
@@ -148,6 +154,26 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     `}>
                       {surah.nameArabic}
                     </div>
+                  )}
+                  {hasAudio && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (surah.audioOptions && surah.audioOptions.length > 0) {
+                          setExpandedSurah(isExpanded ? null : surah.id);
+                        }
+                      }}
+                      className={`
+                        text-[10px] mt-1 flex items-center gap-1 hover:underline
+                        ${!hasAudio ? 'text-slate-600' : isActive ? 'text-indigo-200' : 'text-slate-500'}
+                      `}
+                      aria-label="Select reciter"
+                    >
+                      Reciter: {selectedAudioName}
+                      {surah.audioOptions && surah.audioOptions.length > 0 && (
+                        <ChevronDown size={10} className={isExpanded ? 'rotate-180' : ''} />
+                      )}
+                    </button>
                   )}
                 </button>
                 <button
@@ -187,6 +213,35 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     />
                   )}
                 </button>
+                </div>
+                {isExpanded && surah.audioOptions && surah.audioOptions.length > 0 && (
+                  <div className="px-4 pb-4 border-t border-slate-700/50 mt-2">
+                    <div className="pt-3 space-y-1">
+                      <div className="text-[10px] text-slate-400 mb-2 uppercase tracking-wider">Select Reciter:</div>
+                      {surah.audioOptions.map((option) => (
+                        <button
+                          key={option.name}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onAudioSelect(surah.id, option.name);
+                            setExpandedSurah(null);
+                          }}
+                          className={`
+                            w-full text-left px-3 py-2 rounded-lg text-sm transition-all
+                            ${selectedAudioName === option.name
+                              ? 'bg-indigo-500 text-white'
+                              : isActive
+                                ? 'bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30'
+                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                            }
+                          `}
+                        >
+                          {option.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
