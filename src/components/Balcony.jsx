@@ -8,7 +8,8 @@ export default function Balcony({
   onPrevious, 
   progress, 
   duration,
-  version 
+  version,
+  onShowAbout
 }) {
   return (
     <header 
@@ -17,10 +18,10 @@ export default function Balcony({
     >
       <div className="px-4 py-4">
         <div className="flex items-center justify-between relative">
-          {/* Left: Surah Number */}
+          {/* Left: Surah Name */}
           <div className="flex-shrink-0">
             <span className="text-white font-bold text-base">
-              {currentSurah ? `Surah ${currentSurah.number}` : 'No Surah'}
+              {currentSurah ? currentSurah.name : 'No surah selected'}
             </span>
           </div>
 
@@ -54,9 +55,15 @@ export default function Balcony({
             </button>
           </div>
 
-          {/* Right: Title */}
+          {/* Right: About Us */}
           <div className="flex-shrink-0">
-            <span className="text-white font-bold text-base">Sadaqah Jariyah Radio</span>
+            <button
+              onClick={onShowAbout}
+              className="text-white font-bold text-base hover:text-white/80 transition-all"
+              aria-label="About Us"
+            >
+              About Us
+            </button>
             <span className="text-white/80 font-normal text-xs ml-2">v{version}</span>
           </div>
         </div>

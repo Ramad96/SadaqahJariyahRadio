@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Play, Pause, Search, X, Info } from 'lucide-react';
+import { Play, Pause, Search, X } from 'lucide-react';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
-  const [showAbout, setShowAbout] = useState(false);
 
   const filteredSurahs = surahs.filter((surah) => {
     // Filter by audio availability if checkbox is checked
@@ -26,29 +25,20 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
     <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">
       <div className="max-w-md mx-auto space-y-6">
         <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase flex-1 text-center">
-              Sadaqah Jariyah Radio
-            </h1>
-            <button
-              onClick={() => setShowAbout(true)}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all"
-              aria-label="About Us"
-            >
-              <Info size={20} />
-            </button>
-          </div>
+          <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase text-center mb-2">
+            Sadaqah Jariyah Radio
+          </h1>
           <p className="text-slate-500 text-xs text-center">Select a Surah to begin listening</p>
         </div>
         
         {/* About Us Modal */}
         {showAbout && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowAbout(false)}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseAbout}>
             <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-white">About Us</h2>
                 <button
-                  onClick={() => setShowAbout(false)}
+                  onClick={onCloseAbout}
                   className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
                   aria-label="Close"
                 >

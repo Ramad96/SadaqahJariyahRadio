@@ -3,7 +3,7 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.0.8';
+const VERSION = '1.1.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -11,6 +11,7 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
@@ -210,6 +211,7 @@ function App() {
         progress={progress}
         duration={duration}
         version={VERSION}
+        onShowAbout={() => setShowAbout(true)}
       />
       
       <SurahLibrary
@@ -220,6 +222,8 @@ function App() {
         onAutoPlayNextChange={setAutoPlayNext}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
+        showAbout={showAbout}
+        onCloseAbout={() => setShowAbout(false)}
       />
     </div>
   );
