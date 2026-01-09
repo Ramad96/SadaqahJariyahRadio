@@ -17,32 +17,14 @@ body {
 @keyframes scroll {
   0% {
     transform: translateX(0);
-    opacity: 1;
-  }
-  10% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  60% {
-    transform: translateX(calc(-100% + 200px));
-    opacity: 1;
-  }
-  70% {
-    transform: translateX(calc(-100% + 200px));
-    opacity: 1;
-  }
-  85% {
-    transform: translateX(calc(-100% + 200px));
-    opacity: 0;
   }
   100% {
-    transform: translateX(0);
-    opacity: 0;
+    transform: translateX(calc(-100% - 20px));
   }
 }
 
 .animate-scroll {
-  animation: scroll 12s linear infinite;
+  animation: scroll 40s linear infinite;
   display: inline-block;
   padding-right: 50px;
 }
