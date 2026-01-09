@@ -3,7 +3,7 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs } from './data/surahs';
 
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -120,10 +120,10 @@ function App() {
       ...prev,
       [surahId]: audioName
     }));
-    // If this surah is currently playing, update the audio
-    if (currentSurah && currentSurah.id === surahId) {
-      const updatedSurah = { ...currentSurah };
-      setCurrentSurah(updatedSurah);
+    // Find the surah and start playing it with the selected reciter
+    const surah = surahs.find(s => s.id === surahId);
+    if (surah) {
+      setCurrentSurah(surah);
     }
   };
 

@@ -18,32 +18,41 @@ const surahNames = [
 
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
+  const surahName = surahNames[i];
   // Using import.meta.env.BASE_URL to ensure correct paths with GitHub Pages base path
   const baseUrl = import.meta.env.BASE_URL;
   
-  // Define audio options for each surah
-  const audioOptions = [];
+  // Construct folder path: {number}-{surahName}
+  const folderName = `${surahNumber}-${surahName}`;
+  const folderPath = `${baseUrl}audio_files/surah/${folderName}/`;
   
-  // Add "Default" option with actual audio files for surahs that have them
-  if (surahNumber <= 9) {
-    audioOptions.push({ name: 'Default', url: `${baseUrl}audio_files/audio${surahNumber}.mp3` });
-  } else if (surahNumber === 112) {
-    audioOptions.push({ name: 'Default', url: `${baseUrl}audio_files/surah-iklas.mp3` });
-  } else {
-    audioOptions.push({ name: 'Default', url: null });
+  // Only set audio URL if the file exists in the surah folder
+  // Currently only surahs 1-5 have audio files
+  // If no file exists, set to null so the surah will be greyed out
+  let defaultAudioUrl = null;
+  if (surahNumber <= 5) {
+    // Check if audio file exists in the surah folder
+    defaultAudioUrl = `${folderPath}audio1.mp3`;
   }
   
-  // Add "sample_recording" as second option for all surahs
-  audioOptions.push({ name: 'sample_recording', url: `${baseUrl}audio_files/sample_recording.mp3` });
+  // Define audio options for each surah - only use files from the surah-specific folder
+  const audioOptions = [];
+  
+  // Only add "Default" option if audio file exists
+  if (defaultAudioUrl) {
+    audioOptions.push({ name: 'Default', url: defaultAudioUrl });
+  }
   
   return {
     id: surahNumber,
     number: surahNumber,
-    name: `${surahNumber}. ${surahNames[i]}`,
+    name: `${surahNumber}. ${surahName}`,
     nameArabic: `سورة ${surahNumber}`, // Placeholder - can be replaced with actual Arabic names
+    folderName: folderName,
+    folderPath: folderPath,
     audioOptions: audioOptions,
-    // Legacy support - use first option's URL if available
-    audioUrl: audioOptions[0].url,
+    // Legacy support - use first option's URL if available, null if no file exists
+    audioUrl: defaultAudioUrl,
     // Future-proofing: array for additional clips to be played sequentially
     additionalClips: []
   };
