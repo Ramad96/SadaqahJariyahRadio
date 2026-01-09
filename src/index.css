@@ -13,3 +13,21 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(calc(-100% + 200px));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 10s linear infinite;
+  display: inline-block;
+  padding-right: 50px;
+}

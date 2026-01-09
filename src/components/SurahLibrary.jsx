@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Play, Pause, Search, X, ChevronDown } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio } from 'lucide-react';
 
 export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,11 +26,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   return (
     <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">
       <div className="max-w-md mx-auto space-y-6">
-        <div className="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-2xl">
-          <h1 className="text-2xl font-black text-white italic tracking-tighter uppercase text-center mb-2">
-            Sadaqah Jariyah Radio
+        <div className="text-center py-1">
+          <h1 className="text-2xl font-black text-white italic tracking-tighter mb-0.5 flex items-center justify-center gap-2">
+            Sadaqah Jariyah Radio <Radio size={24} className="text-white" />
           </h1>
-          <p className="text-slate-500 text-xs text-center">Select a Surah to begin listening</p>
+          <p className="text-slate-500 text-xs">Select a Surah to begin listening</p>
         </div>
         
         {/* About Us Modal */}
@@ -63,6 +63,32 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         )}
         
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+          <div className="mb-4 flex gap-2">
+            <button
+              onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
+              className={`
+                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
+                ${showOnlyWithAudio
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }
+              `}
+            >
+              With audio only
+            </button>
+            <button
+              onClick={() => onAutoPlayNextChange(!autoPlayNext)}
+              className={`
+                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
+                ${autoPlayNext
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }
+              `}
+            >
+              Auto play next
+            </button>
+          </div>
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
             <input
@@ -72,32 +98,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-          </div>
-          <div className="mb-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="showOnlyWithAudio"
-                checked={showOnlyWithAudio}
-                onChange={(e) => setShowOnlyWithAudio(e.target.checked)}
-                className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
-              />
-              <label htmlFor="showOnlyWithAudio" className="text-sm text-slate-300 cursor-pointer select-none">
-                Show only surahs with audio
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="autoPlayNext"
-                checked={autoPlayNext}
-                onChange={(e) => onAutoPlayNextChange(e.target.checked)}
-                className="w-4 h-4 rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
-              />
-              <label htmlFor="autoPlayNext" className="text-sm text-slate-300 cursor-pointer select-none">
-                Auto play next surah
-              </label>
-            </div>
           </div>
           <div className="h-[380px] overflow-y-auto">
             <div className="space-y-2">

@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 export default function Balcony({ 
@@ -11,6 +12,17 @@ export default function Balcony({
   version,
   onShowAbout
 }) {
+  const textRef = useRef(null);
+  const containerRef = useRef(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
+
+  useEffect(() => {
+    if (textRef.current && containerRef.current) {
+      const textWidth = textRef.current.scrollWidth;
+      const containerWidth = containerRef.current.offsetWidth;
+      setShouldScroll(textWidth > containerWidth);
+    }
+  }, [currentSurah]);
   return (
     <header 
       className="fixed top-0 left-0 right-0 z-50 bg-orange-500 shadow-lg"
@@ -19,10 +31,13 @@ export default function Balcony({
       <div className="px-4 py-4">
         <div className="flex items-center justify-between relative">
           {/* Left: Surah Name */}
-          <div className="flex-shrink-0">
-            <span className="text-white font-bold text-base">
+          <div ref={containerRef} className="flex-shrink-0 max-w-[calc(50%-80px)] overflow-hidden">
+            <div 
+              ref={textRef}
+              className={`text-white font-bold text-base whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
+            >
               {currentSurah ? currentSurah.name : 'No surah selected'}
-            </span>
+            </div>
           </div>
 
           {/* Center: Controls */}
