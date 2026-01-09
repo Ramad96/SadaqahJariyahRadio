@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Play, Pause, Search, X, ChevronDown, Radio } from 'lucide-react';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, audioMode, onAudioModeChange }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -65,6 +65,32 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
           <div className="mb-4 flex gap-2">
             <button
+              onClick={() => onAudioModeChange('wholeQuran')}
+              className={`
+                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
+                ${audioMode === 'wholeQuran'
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }
+              `}
+            >
+              Whole Quran
+            </button>
+            <button
+              onClick={() => onAudioModeChange('clips')}
+              className={`
+                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
+                ${audioMode === 'clips'
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }
+              `}
+            >
+              Bits/Clips
+            </button>
+          </div>
+          <div className="mb-4 flex gap-2">
+            <button
               onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
               className={`
                 flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
@@ -105,7 +131,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
             const isActive = currentSurah?.id === surah.id;
             const audioUrl = getSurahAudioUrl(surah);
             const hasAudio = audioUrl !== null;
-            const selectedAudioName = selectedAudio[surah.id] || 'Default';
+            // Get selected audio option name, defaulting to first available option
+            const selectedAudioKey = selectedAudio[surah.id];
+            const selectedOption = surah.audioOptions?.find(opt => opt.name === selectedAudioKey) || surah.audioOptions?.[0];
+            const selectedAudioName = selectedOption?.name || (surah.audioOptions?.length > 0 ? surah.audioOptions[0].name : 'Default');
             const isExpanded = expandedSurah === surah.id;
             
             return (
@@ -155,7 +184,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                       {surah.nameArabic}
                     </div>
                   )}
-                  {hasAudio && (
+                  {hasAudio && selectedOption && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -169,7 +198,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                       `}
                       aria-label="Select reciter"
                     >
-                      Reciter: {selectedAudioName}
+                      Reciter: {selectedOption.isClip ? (selectedOption.reciter || selectedAudioName) : selectedAudioName}
+                      {selectedOption.range && ` (${selectedOption.range})`}
                       {surah.audioOptions && surah.audioOptions.length > 0 && (
                         <ChevronDown size={10} className={isExpanded ? 'rotate-180' : ''} />
                       )}
@@ -225,6 +255,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                             e.stopPropagation();
                             onAudioSelect(surah.id, option.name);
                             setExpandedSurah(null);
+                            onSurahSelect(surah);
                           }}
                           className={`
                             w-full text-left px-3 py-2 rounded-lg text-sm transition-all
@@ -236,7 +267,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                             }
                           `}
                         >
-                          {option.name}
+                          {option.reciter || option.name}
+                          {option.range && ` (${option.range})`}
                         </button>
                       ))}
                     </div>
