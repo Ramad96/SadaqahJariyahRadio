@@ -4,7 +4,7 @@ import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -290,10 +290,21 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isPlaying]);
 
+  // Get the selected audio option for the current surah
+  const currentAudioOption = currentSurah ? (() => {
+    const selectedOptionName = selectedAudio[currentSurah.id];
+    const option = selectedOptionName 
+      ? currentSurah.audioOptions?.find(opt => opt.name === selectedOptionName) 
+      : null;
+    return option || currentSurah.audioOptions?.[0] || null;
+  })() : null;
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <Balcony
         currentSurah={currentSurah}
+        currentAudioOption={currentAudioOption}
+        audioMode={audioMode}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
         onNext={handleNext}

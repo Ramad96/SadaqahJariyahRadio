@@ -3,6 +3,8 @@ import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 export default function Balcony({ 
   currentSurah, 
+  currentAudioOption,
+  audioMode,
   isPlaying, 
   onPlayPause, 
   onNext, 
@@ -16,13 +18,27 @@ export default function Balcony({
   const containerRef = useRef(null);
   const [shouldScroll, setShouldScroll] = useState(false);
 
+  // Build the display text with surah name, reciter, and ayah range (if in clips mode)
+  const displayText = currentSurah ? (() => {
+    let text = currentSurah.name;
+    if (currentAudioOption) {
+      const reciterName = currentAudioOption.reciter || currentAudioOption.name;
+      text += ` - ${reciterName}`;
+      // Add ayah range in brackets if in clips mode and range exists
+      if (audioMode === 'clips' && currentAudioOption.range) {
+        text += ` (${currentAudioOption.range})`;
+      }
+    }
+    return text;
+  })() : 'No surah selected';
+
   useEffect(() => {
     if (textRef.current && containerRef.current) {
       const textWidth = textRef.current.scrollWidth;
       const containerWidth = containerRef.current.offsetWidth;
       setShouldScroll(textWidth > containerWidth);
     }
-  }, [currentSurah]);
+  }, [currentSurah, currentAudioOption, audioMode]);
   return (
     <header 
       className="fixed top-0 left-0 right-0 z-50 bg-orange-500 shadow-lg"
@@ -36,7 +52,7 @@ export default function Balcony({
               ref={textRef}
               className={`text-white font-bold text-base whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
             >
-              {currentSurah ? currentSurah.name : 'No surah selected'}
+              {displayText}
             </div>
           </div>
 
