@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info } from 'lucide-react';
+import { getReciterDescription } from '../data/reciterDescriptions';
 
 export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, audioMode, onAudioModeChange }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -7,6 +8,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const [expandedSurah, setExpandedSurah] = useState(null);
   const [aboutSection, setAboutSection] = useState('mission');
   const [contentHeight, setContentHeight] = useState(0);
+  const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
   const missionRef = useRef(null);
   const duaRef = useRef(null);
   const uploadRef = useRef(null);
@@ -52,6 +54,27 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
           </h1>
           <p className="text-slate-500 text-xs">Select a Surah to begin listening</p>
         </div>
+        
+        {/* Reciter Info Modal */}
+        {showReciterInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowReciterInfo(null)}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">{showReciterInfo.reciterName}</h2>
+                <button
+                  onClick={() => setShowReciterInfo(null)}
+                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="text-slate-300 text-sm leading-relaxed">
+                <p>{showReciterInfo.description}</p>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* About Us Modal */}
         {showAbout && (
@@ -350,29 +373,47 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   <div className="px-4 pb-4 border-t border-slate-700/50 mt-2">
                     <div className="pt-3 space-y-1">
                       <div className="text-[10px] text-slate-400 mb-2 uppercase tracking-wider">Select Reciter:</div>
-                      {surah.audioOptions.map((option) => (
-                        <button
-                          key={option.name}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onAudioSelect(surah.id, option.name);
-                            setExpandedSurah(null);
-                            onSurahSelect(surah);
-                          }}
-                          className={`
-                            w-full text-left px-3 py-2 rounded-lg text-sm transition-all
-                            ${selectedAudioName === option.name
-                              ? 'bg-indigo-500 text-white'
-                              : isActive
-                                ? 'bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30'
-                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                            }
-                          `}
-                        >
-                          {option.reciter || option.name}
-                          {option.range && ` (${option.range})`}
-                        </button>
-                      ))}
+                      {surah.audioOptions.map((option) => {
+                        const reciterName = option.reciter || option.name;
+                        const description = getReciterDescription(reciterName);
+                        return (
+                          <div
+                            key={option.name}
+                            className={`
+                              w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all
+                              ${selectedAudioName === option.name
+                                ? 'bg-indigo-500 text-white'
+                                : isActive
+                                  ? 'bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30'
+                                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                              }
+                            `}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAudioSelect(surah.id, option.name);
+                                setExpandedSurah(null);
+                                onSurahSelect(surah);
+                              }}
+                              className="flex-1 text-left"
+                            >
+                              {reciterName}
+                              {option.range && ` (${option.range})`}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowReciterInfo({ reciterName, description });
+                              }}
+                              className="p-1 rounded hover:bg-white/20 transition-all flex-shrink-0"
+                              aria-label="Reciter information"
+                            >
+                              <Info size={16} />
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

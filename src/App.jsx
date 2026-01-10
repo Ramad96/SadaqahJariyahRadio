@@ -4,7 +4,7 @@ import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 
-const VERSION = '1.9.0';
+const VERSION = '2.0.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -331,6 +331,12 @@ function App() {
         audioMode={audioMode}
         onAudioModeChange={setAudioMode}
       />
+      
+      <footer className="w-full py-6 mt-8 border-t border-slate-800">
+        <div className="text-center text-slate-400 text-sm">
+          Created by <span className="text-slate-300 font-semibold">AmanahDigital1447</span>
+        </div>
+      </footer>
     </div>
   );
 }
