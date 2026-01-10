@@ -1,13 +1,14 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run generate-manifest && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-manifest": "node scripts/generateAudioManifest.js"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",

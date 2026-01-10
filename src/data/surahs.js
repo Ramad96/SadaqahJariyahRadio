@@ -1,5 +1,8 @@
 // Data structure for all 114 Surahs
-// Future-proofed with additionalClips array for sequential audio clips
+// Uses auto-generated manifest to detect available audio files
+
+import { surahManifest } from './surahManifest';
+import { parseClipFilename } from '../utils/clipParser';
 
 const surahNames = [
   'Al-Fatihah', 'Al-Baqarah', 'Al-Imran', 'An-Nisa', 'Al-Ma\'idah', 'Al-An\'am', 'Al-A\'raf', 'Al-Anfal', 'At-Tawbah', 'Yunus',
@@ -19,29 +22,38 @@ const surahNames = [
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
   const surahName = surahNames[i];
-  // Using import.meta.env.BASE_URL to ensure correct paths with GitHub Pages base path
   const baseUrl = import.meta.env.BASE_URL;
   
   // Construct folder path: {number}-{surahName}
   const folderName = `${surahNumber}-${surahName}`;
   const folderPath = `${baseUrl}audio_files/surah/${folderName}/`;
   
-  // Only set audio URL if the file exists in the surah folder
-  // Currently only surahs 1-5 have audio files
-  // If no file exists, set to null so the surah will be greyed out
-  let defaultAudioUrl = null;
-  if (surahNumber <= 5) {
-    // Check if audio file exists in the surah folder
-    defaultAudioUrl = `${folderPath}audio1.mp3`;
-  }
+  // Get audio files from manifest
+  const surahFiles = surahManifest[surahNumber] || [];
   
-  // Define audio options for each surah - only use files from the surah-specific folder
-  const audioOptions = [];
+  // Build audio options from manifest
+  const audioOptions = surahFiles.map(file => {
+    // Check if it's a clip format (ReciterName_1-10.mp3)
+    const parsed = parseClipFilename(file.filename);
+    if (parsed) {
+      return {
+        name: parsed.displayName,
+        reciter: parsed.reciter,
+        range: parsed.range,
+        url: `${folderPath}${file.filename}`,
+        isClip: false
+      };
+    } else {
+      // Regular audio file
+      return {
+        name: file.name || file.filename.replace('.mp3', ''),
+        url: `${folderPath}${file.filename}`
+      };
+    }
+  });
   
-  // Only add "Default" option if audio file exists
-  if (defaultAudioUrl) {
-    audioOptions.push({ name: 'Default', url: defaultAudioUrl });
-  }
+  // Legacy support - use first option's URL if available, null if no file exists
+  const audioUrl = audioOptions.length > 0 ? audioOptions[0].url : null;
   
   return {
     id: surahNumber,
@@ -51,8 +63,7 @@ export const surahs = Array.from({ length: 114 }, (_, i) => {
     folderName: folderName,
     folderPath: folderPath,
     audioOptions: audioOptions,
-    // Legacy support - use first option's URL if available, null if no file exists
-    audioUrl: defaultAudioUrl,
+    audioUrl: audioUrl,
     // Future-proofing: array for additional clips to be played sequentially
     additionalClips: []
   };
