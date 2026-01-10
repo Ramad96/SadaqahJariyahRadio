@@ -12,32 +12,4 @@ export const surahManifest = {
           "isClip": false
       }
   ],
-  2: [
-      {
-          "filename": "audio1.mp3",
-          "name": "audio1",
-          "isClip": false
-      }
-  ],
-  3: [
-      {
-          "filename": "audio1.mp3",
-          "name": "audio1",
-          "isClip": false
-      }
-  ],
-  4: [
-      {
-          "filename": "audio1.mp3",
-          "name": "audio1",
-          "isClip": false
-      }
-  ],
-  5: [
-      {
-          "filename": "audio1.mp3",
-          "name": "audio1",
-          "isClip": false
-      }
-  ],
 };

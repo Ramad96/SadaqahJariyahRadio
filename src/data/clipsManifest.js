@@ -10,6 +10,26 @@ export const clipsManifest = {
           "filename": "SheikhFouadSaeedAbdulkadir_1-7.mp3"
       }
   ],
+  2: [
+      {
+          "filename": "ShiekhMagdiOsman_285-285.mp3"
+      }
+  ],
+  67: [
+      {
+          "filename": "ShiekhMagdiOsman_12-19.mp3"
+      }
+  ],
+  82: [
+      {
+          "filename": "ShiekhMagdiOsman_10-19.mp3"
+      }
+  ],
+  87: [
+      {
+          "filename": "ShiekhMagdiOsman_1-19.mp3"
+      }
+  ],
   109: [
       {
           "filename": "ShiekhMagdiOsman_1-6.mp3"

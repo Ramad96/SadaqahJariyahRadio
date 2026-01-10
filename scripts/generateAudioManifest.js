@@ -83,8 +83,10 @@ function scanClipsFolder(surahNumber, surahName) {
           displayName: parsed.displayName,
           isClip: true
         };
+      } else {
+        console.warn(`⚠️  Skipping file "${file}" in clips/${folderName}/ - filename must match pattern: ReciterName_Range.mp3 (e.g., ShiekhMagdiOsman_1-6.mp3)`);
+        return null;
       }
-      return null;
     })
     .filter(Boolean);
   
