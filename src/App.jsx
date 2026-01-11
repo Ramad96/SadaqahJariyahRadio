@@ -4,7 +4,7 @@ import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 
-const VERSION = '2.1.0';
+const VERSION = '2.2.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
