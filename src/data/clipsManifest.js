@@ -66,11 +66,6 @@ export const clipsManifest = {
           "filename": "ShiekhMagdiOsman_1-6.mp3"
       }
   ],
-  112: [
-      {
-          "filename": "Stranger_1-4.mp3"
-      }
-  ],
 };
 
 /**
