@@ -72,6 +72,12 @@ This file tracks videos that have been processed into audio clips for the Quran 
 - **Notes**: 
 - **Audio File**: Stranger_1-4.mp3 
 
+### Surah 112 - Al-Tariq
+- **Video Link**: EMAIL
+- **Status**: ✅ Done
+- **Notes**: 
+- **Audio File**: ShiekhMagdiOsman_1-17.mp3 
+
 ---
 
 ## In Progress

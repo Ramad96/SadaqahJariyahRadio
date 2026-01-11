@@ -8,9 +8,15 @@ export const clipsManifest = {
   1: [
       {
           "filename": "SheikhFouadSaeedAbdulkadir_1-7.mp3"
+      },
+      {
+          "filename": "ShiekhMagdiOsman_1-7.mp3"
       }
   ],
   2: [
+      {
+          "filename": "IbrahimAshShishani_154-157.mp3"
+      },
       {
           "filename": "ShiekhMagdiOsman_285-285.mp3"
       }
@@ -20,14 +26,39 @@ export const clipsManifest = {
           "filename": "ShiekhMagdiOsman_12-19.mp3"
       }
   ],
+  68: [
+      {
+          "filename": "ShiekhMagdiOsman_1-16.mp3"
+      }
+  ],
+  75: [
+      {
+          "filename": "ZaydDesai_31-40.mp3"
+      }
+  ],
+  81: [
+      {
+          "filename": "ShiekhMagdiOsman_15-29.mp3"
+      }
+  ],
   82: [
       {
           "filename": "ShiekhMagdiOsman_10-19.mp3"
       }
   ],
+  86: [
+      {
+          "filename": "ShiekhMagdiOsman_1-17.mp3"
+      }
+  ],
   87: [
       {
           "filename": "ShiekhMagdiOsman_1-19.mp3"
+      }
+  ],
+  104: [
+      {
+          "filename": "ShiekhMagdiOsman_1-9.mp3"
       }
   ],
   109: [
