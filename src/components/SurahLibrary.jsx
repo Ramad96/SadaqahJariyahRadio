@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 
 export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, audioMode, onAudioModeChange }) {
@@ -9,6 +9,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const [aboutSection, setAboutSection] = useState('mission');
   const [contentHeight, setContentHeight] = useState(0);
   const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
+  const [showHelp, setShowHelp] = useState(false);
   const missionRef = useRef(null);
   const duaRef = useRef(null);
   const uploadRef = useRef(null);
@@ -52,8 +53,56 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
           <h1 className="text-2xl font-black text-white italic tracking-tighter mb-0.5 flex items-center justify-center gap-2">
             Sadaqah Jariyah Radio <Radio size={24} className="text-white" />
           </h1>
-          <p className="text-slate-500 text-xs">Select a Surah to begin listening</p>
+          <p className="text-slate-500 text-xs flex items-center justify-center gap-1">
+            Select a Surah to begin listening
+            <button
+              onClick={() => setShowHelp(true)}
+              className="text-slate-400 hover:text-slate-300 transition-colors"
+              aria-label="Show help"
+            >
+              <HelpCircle size={14} />
+            </button>
+          </p>
         </div>
+        
+        {/* Help Modal */}
+        {showHelp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowHelp(false)}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">How to Use</h2>
+                <button
+                  onClick={() => setShowHelp(false)}
+                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="text-slate-300 text-sm leading-relaxed space-y-4">
+                <div>
+                  <h3 className="text-white font-semibold mb-2">Selecting a Reciter:</h3>
+                  <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio options.</p>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-2">Whole Quran vs Clips:</h3>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li><strong>Whole Quran:</strong> Listen to complete surahs from beginning to end.</li>
+                    <li><strong>Bits/Clips:</strong> Listen to specific verse ranges or segments of surahs.</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-2">Tips:</h3>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>Use the search bar to find surahs quickly</li>
+                    <li>Enable "With audio only" to filter surahs that have available recordings</li>
+                    <li>Enable "Auto play next" to automatically continue to the next surah</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Reciter Info Modal */}
         {showReciterInfo && (
