@@ -67,3 +67,36 @@ export function createClipAudioOption(filename, surahFolderName) {
   };
 }
 
+/**
+ * Checks if a range covers the complete surah
+ * @param {string} range - The range string (e.g., "1-7", "1-286")
+ * @param {number} totalAyahs - Total number of ayahs in the surah
+ * @returns {boolean} - True if the range covers the complete surah
+ */
+export function isCompleteSurah(range, totalAyahs) {
+  if (!range || !totalAyahs) return false;
+  
+  // Parse the range (e.g., "1-7" -> [1, 7])
+  const parts = range.split('-');
+  if (parts.length !== 2) return false;
+  
+  const start = parseInt(parts[0], 10);
+  const end = parseInt(parts[1], 10);
+  
+  // Check if range starts at 1 and ends at totalAyahs
+  return start === 1 && end === totalAyahs;
+}
+
+/**
+ * Gets the display text for a range
+ * @param {string} range - The range string (e.g., "1-7", "1-286")
+ * @param {number} totalAyahs - Total number of ayahs in the surah
+ * @returns {string} - "Complete Surah" if it covers all ayahs, otherwise the range
+ */
+export function getRangeDisplay(range, totalAyahs) {
+  if (isCompleteSurah(range, totalAyahs)) {
+    return 'Complete Surah';
+  }
+  return range;
+}
+

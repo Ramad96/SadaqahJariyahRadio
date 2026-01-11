@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
+import { getRangeDisplay } from '../utils/clipParser';
 
 export default function Balcony({ 
   currentSurah, 
   currentAudioOption,
-  audioMode,
   isPlaying, 
   onPlayPause, 
   onNext, 
@@ -18,15 +18,16 @@ export default function Balcony({
   const containerRef = useRef(null);
   const [shouldScroll, setShouldScroll] = useState(false);
 
-  // Build the display text with surah name, reciter, and ayah range (if in clips mode)
+  // Build the display text with surah name, reciter, and ayah range
   const baseText = currentSurah ? (() => {
     let text = currentSurah.name;
     if (currentAudioOption) {
       const reciterName = currentAudioOption.reciter || currentAudioOption.name;
       text += ` - ${reciterName}`;
-      // Add ayah range in brackets if in clips mode and range exists
-      if (audioMode === 'clips' && currentAudioOption.range) {
-        text += ` (${currentAudioOption.range})`;
+      // Add ayah range in brackets if range exists
+      if (currentAudioOption.range) {
+        const rangeDisplay = getRangeDisplay(currentAudioOption.range, currentSurah.totalAyahs);
+        text += ` (${rangeDisplay})`;
       }
     }
     return text;
@@ -38,7 +39,7 @@ export default function Balcony({
       const containerWidth = containerRef.current.offsetWidth;
       setShouldScroll(textWidth > containerWidth);
     }
-  }, [currentSurah, currentAudioOption, audioMode]);
+  }, [currentSurah, currentAudioOption]);
   return (
     <header 
       className="fixed top-0 left-0 right-0 z-50 bg-orange-500 shadow-lg"

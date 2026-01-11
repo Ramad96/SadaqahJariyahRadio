@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
+import { getRangeDisplay } from '../utils/clipParser';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, audioMode, onAudioModeChange }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -82,14 +83,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
               <div className="text-slate-300 text-sm leading-relaxed space-y-4">
                 <div>
                   <h3 className="text-white font-semibold mb-2">Selecting a Reciter:</h3>
-                  <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio options.</p>
+                  <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio clips with specific verse ranges.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Whole Quran vs Clips:</h3>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li><strong>Whole Quran:</strong> Listen to complete surahs from beginning to end.</li>
-                    <li><strong>Bits/Clips:</strong> Listen to specific verse ranges or segments of surahs.</li>
-                  </ul>
+                  <h3 className="text-white font-semibold mb-2">About Clips:</h3>
+                  <p>This app features audio clips - specific verse ranges or segments of surahs. Each clip shows the verse range (e.g., 1-7) so you know which verses are included.</p>
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-2">Tips:</h3>
@@ -239,32 +237,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
           <div className="mb-4 flex gap-2">
             <button
-              onClick={() => onAudioModeChange('wholeQuran')}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
-                ${audioMode === 'wholeQuran'
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }
-              `}
-            >
-              Whole Quran
-            </button>
-            <button
-              onClick={() => onAudioModeChange('clips')}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
-                ${audioMode === 'clips'
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }
-              `}
-            >
-              Bits/Clips
-            </button>
-          </div>
-          <div className="mb-4 flex gap-2">
-            <button
               onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
               className={`
                 flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
@@ -373,7 +345,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                       aria-label="Select reciter"
                     >
                       Reciter: {selectedOption.isClip ? (selectedOption.reciter || selectedAudioName) : selectedAudioName}
-                      {selectedOption.range && ` (${selectedOption.range})`}
+                      {selectedOption.range && ` (${getRangeDisplay(selectedOption.range, surah.totalAyahs)})`}
                       {surah.audioOptions && surah.audioOptions.length > 0 && (
                         <ChevronDown size={10} className={isExpanded ? 'rotate-180' : ''} />
                       )}
@@ -448,7 +420,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                               className="flex-1 text-left"
                             >
                               {reciterName}
-                              {option.range && ` (${option.range})`}
+                              {option.range && ` (${getRangeDisplay(option.range, surah.totalAyahs)})`}
                             </button>
                             <button
                               onClick={(e) => {

@@ -4,7 +4,7 @@ import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 
-const VERSION = '2.4.0';
+const VERSION = '2.5.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -13,32 +13,23 @@ function App() {
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
-  const [audioMode, setAudioMode] = useState(() => {
-    // Load from localStorage or default to 'wholeQuran'
-    const saved = localStorage.getItem('audioMode');
-    return saved || 'wholeQuran';
-  });
   const [selectedAudio, setSelectedAudio] = useState(() => {
     // Load from localStorage or default to "Default" for all surahs
     const saved = localStorage.getItem('selectedAudio');
     return saved ? JSON.parse(saved) : {};
   });
   
-  // Enrich surahs with clips when in clips mode
+  // Always use clips mode
   const surahs = useMemo(() => {
-    if (audioMode === 'clips') {
-      return baseSurahs.map(surah => {
-        const clips = getClipsForSurah(surah.number, surah.folderName);
-        return {
-          ...surah,
-          audioOptions: clips,
-          audioUrl: clips.length > 0 ? clips[0].url : null
-        };
-      });
-    } else {
-      return baseSurahs;
-    }
-  }, [audioMode]);
+    return baseSurahs.map(surah => {
+      const clips = getClipsForSurah(surah.number, surah.folderName);
+      return {
+        ...surah,
+        audioOptions: clips,
+        audioUrl: clips.length > 0 ? clips[0].url : null
+      };
+    });
+  }, []);
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
@@ -49,12 +40,6 @@ function App() {
     localStorage.setItem('selectedAudio', JSON.stringify(selectedAudio));
   }, [selectedAudio]);
   
-  // Save audio mode to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('audioMode', audioMode);
-    // Clear selected audio when mode changes to avoid confusion
-    setSelectedAudio({});
-  }, [audioMode]);
   
   // Clear current surah if it doesn't have audio when surahs change (mode switch)
   useEffect(() => {
@@ -304,7 +289,6 @@ function App() {
       <Balcony
         currentSurah={currentSurah}
         currentAudioOption={currentAudioOption}
-        audioMode={audioMode}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
         onNext={handleNext}
@@ -328,8 +312,6 @@ function App() {
         selectedAudio={selectedAudio}
         onAudioSelect={handleAudioSelect}
         getSurahAudioUrl={getSurahAudioUrl}
-        audioMode={audioMode}
-        onAudioModeChange={setAudioMode}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">
