@@ -1,7 +1,7 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.5.0",
+  "version": "2.7.0",
   "type": "module",
   "scripts": {
     "dev": "npm run generate-manifest && vite",
@@ -11,6 +11,7 @@
     "generate-manifest": "node scripts/generateAudioManifest.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"

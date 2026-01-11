@@ -3,8 +3,9 @@ import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
+import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.5.0';
+const VERSION = '2.7.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -17,6 +18,11 @@ function App() {
     // Load from localStorage or default to "Default" for all surahs
     const saved = localStorage.getItem('selectedAudio');
     return saved ? JSON.parse(saved) : {};
+  });
+  const [totalListeningTime, setTotalListeningTime] = useState(() => {
+    // Load accumulated listening time from localStorage (in seconds)
+    const saved = localStorage.getItem('totalListeningTime');
+    return saved ? parseFloat(saved) : 0;
   });
   
   // Always use clips mode
@@ -34,11 +40,95 @@ function App() {
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
   const autoPlayNextRef = useRef(false);
+  const listeningTimeIntervalRef = useRef(null);
+  const lastUpdateTimeRef = useRef(null);
+  const accumulatedGlobalTimeRef = useRef(0); // Accumulate before sending to Supabase
   
   // Save selected audio to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('selectedAudio', JSON.stringify(selectedAudio));
   }, [selectedAudio]);
+
+  // Save total listening time to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('totalListeningTime', totalListeningTime.toString());
+  }, [totalListeningTime]);
+
+  // Track listening time when audio is playing
+  useEffect(() => {
+    if (isPlaying) {
+      // Start tracking time
+      lastUpdateTimeRef.current = Date.now();
+      listeningTimeIntervalRef.current = setInterval(() => {
+        const now = Date.now();
+        const elapsed = (now - lastUpdateTimeRef.current) / 1000; // Convert to seconds
+        lastUpdateTimeRef.current = now;
+        
+        setTotalListeningTime(prev => {
+          const newTotal = prev + elapsed;
+          // Save to localStorage immediately for persistence
+          localStorage.setItem('totalListeningTime', newTotal.toString());
+          return newTotal;
+        });
+        
+        // Accumulate for global stats (batch updates every 10 seconds to reduce API calls)
+        accumulatedGlobalTimeRef.current += elapsed;
+        if (accumulatedGlobalTimeRef.current >= 10) {
+          const timeToSend = accumulatedGlobalTimeRef.current;
+          accumulatedGlobalTimeRef.current = 0;
+          // Send to Supabase asynchronously (don't wait for response)
+          incrementGlobalListeningTime(timeToSend).catch(err => {
+            console.error('Failed to update global listening time:', err);
+            // Re-accumulate if it failed (will retry next interval)
+            accumulatedGlobalTimeRef.current += timeToSend;
+          });
+        }
+      }, 1000); // Update every second
+    } else {
+      // Stop tracking time
+      if (listeningTimeIntervalRef.current) {
+        clearInterval(listeningTimeIntervalRef.current);
+        listeningTimeIntervalRef.current = null;
+      }
+      // Save any remaining time
+      if (lastUpdateTimeRef.current) {
+        const now = Date.now();
+        const elapsed = (now - lastUpdateTimeRef.current) / 1000;
+        if (elapsed > 0) {
+          setTotalListeningTime(prev => {
+            const newTotal = prev + elapsed;
+            localStorage.setItem('totalListeningTime', newTotal.toString());
+            return newTotal;
+          });
+          
+          // Send remaining accumulated time to global stats
+          accumulatedGlobalTimeRef.current += elapsed;
+          if (accumulatedGlobalTimeRef.current > 0) {
+            const timeToSend = accumulatedGlobalTimeRef.current;
+            accumulatedGlobalTimeRef.current = 0;
+            incrementGlobalListeningTime(timeToSend).catch(err => {
+              console.error('Failed to update global listening time:', err);
+            });
+          }
+        }
+        lastUpdateTimeRef.current = null;
+      } else if (accumulatedGlobalTimeRef.current > 0) {
+        // Send any remaining accumulated time when stopping
+        const timeToSend = accumulatedGlobalTimeRef.current;
+        accumulatedGlobalTimeRef.current = 0;
+        incrementGlobalListeningTime(timeToSend).catch(err => {
+          console.error('Failed to update global listening time:', err);
+        });
+      }
+    }
+
+    return () => {
+      if (listeningTimeIntervalRef.current) {
+        clearInterval(listeningTimeIntervalRef.current);
+        listeningTimeIntervalRef.current = null;
+      }
+    };
+  }, [isPlaying]);
   
   
   // Clear current surah if it doesn't have audio when surahs change (mode switch)
@@ -312,6 +402,7 @@ function App() {
         selectedAudio={selectedAudio}
         onAudioSelect={handleAudioSelect}
         getSurahAudioUrl={getSurahAudioUrl}
+        totalListeningTime={totalListeningTime}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">

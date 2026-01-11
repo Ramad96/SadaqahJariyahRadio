@@ -2,8 +2,34 @@ import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
+import { getGlobalListeningStats } from '../utils/supabase';
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl }) {
+// Format listening time in seconds to a human-readable string
+function formatListeningTime(seconds) {
+  if (!seconds || seconds < 1) {
+    return '0 seconds';
+  }
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  const parts = [];
+  if (hours > 0) {
+    parts.push(`${hours} ${hours === 1 ? 'hour' : 'hours'}`);
+  }
+  if (minutes > 0) {
+    parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`);
+  }
+  if (secs > 0 && hours === 0) {
+    // Only show seconds if less than an hour
+    parts.push(`${secs} ${secs === 1 ? 'second' : 'seconds'}`);
+  }
+  
+  return parts.join(', ') || '0 seconds';
+}
+
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -11,9 +37,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const [contentHeight, setContentHeight] = useState(0);
   const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
   const [showHelp, setShowHelp] = useState(false);
+  const [globalListeningTime, setGlobalListeningTime] = useState(null); // null = loading, number = seconds
   const missionRef = useRef(null);
   const duaRef = useRef(null);
   const uploadRef = useRef(null);
+  const statsRef = useRef(null);
   const contentContainerRef = useRef(null);
   
   // Calculate the maximum height of all content sections
@@ -23,12 +51,36 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
       const missionHeight = missionRef.current?.scrollHeight || 0;
       const duaHeight = duaRef.current?.scrollHeight || 0;
       const uploadHeight = uploadRef.current?.scrollHeight || 0;
-      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight);
+      const statsHeight = statsRef.current?.scrollHeight || 0;
+      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight);
       if (maxHeight > 0) {
         setContentHeight(maxHeight);
       }
     }
-  }, [showAbout]);
+  }, [showAbout, totalListeningTime]);
+
+  // Fetch global listening stats on component mount and periodically
+  useEffect(() => {
+    // Fetch global stats immediately
+    getGlobalListeningStats().then(stats => {
+      if (stats) {
+        setGlobalListeningTime(stats.totalSeconds);
+      } else {
+        setGlobalListeningTime(null);
+      }
+    });
+    
+    // Refresh global stats every 10 seconds
+    const interval = setInterval(() => {
+      getGlobalListeningStats().then(stats => {
+        if (stats) {
+          setGlobalListeningTime(stats.totalSeconds);
+        }
+      });
+    }, 10000); // Refresh every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredSurahs = surahs.filter((surah) => {
     // Filter by audio availability if checkbox is checked
@@ -170,6 +222,16 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                 >
                   Upload
                 </button>
+                <button
+                  onClick={() => setAboutSection('stats')}
+                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
+                    aboutSection === 'stats'
+                      ? 'text-white border-b-2 border-indigo-500'
+                      : 'text-slate-400 hover:text-slate-300'
+                  }`}
+                >
+                  Stats
+                </button>
               </div>
               
               {/* Section Content */}
@@ -203,6 +265,36 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   </p>
                 </div>
                 
+                <div ref={statsRef} className="absolute opacity-0 pointer-events-none invisible">
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="mb-1">
+                          <span className="font-semibold text-white">Your Listening Time:</span>
+                        </p>
+                        <p className="text-slate-300">
+                          {formatListeningTime(totalListeningTime)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Your personal listening time (saved locally)
+                        </p>
+                      </div>
+                      <div className="border-t border-slate-700 pt-3">
+                        <p className="mb-1">
+                          <span className="font-semibold text-white">Global Listening Time:</span>
+                        </p>
+                        <p className="text-slate-300">
+                          {formatListeningTime(0)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Combined listening time from all users worldwide
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 {/* Visible content based on selected section */}
                 {aboutSection === 'mission' && (
                   <>
@@ -228,6 +320,44 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   <p>
                     If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
                   </p>
+                )}
+                
+                {aboutSection === 'stats' && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="mb-1">
+                          <span className="font-semibold text-white">Your Listening Time:</span>
+                        </p>
+                        <p className="text-slate-300">
+                          {formatListeningTime(totalListeningTime)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Your personal listening time (saved locally)
+                        </p>
+                      </div>
+                      <div className="border-t border-slate-700 pt-3">
+                        <p className="mb-1">
+                          <span className="font-semibold text-white">Global Listening Time:</span>
+                        </p>
+                        {globalListeningTime !== null ? (
+                          <>
+                            <p className="text-slate-300">
+                              {formatListeningTime(globalListeningTime)}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-1">
+                              Combined listening time from all users worldwide
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-slate-400 text-sm">
+                            Loading...
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -441,6 +571,43 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
               </div>
             );
           })}
+            </div>
+          </div>
+        </div>
+        
+        {/* Listening Statistics Section */}
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+          <h3 className="text-white font-semibold mb-4 text-center">Listening Statistics</h3>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-1 text-sm text-slate-400">
+                <span className="font-semibold text-white">Your Listening Time:</span>
+              </p>
+              <p className="text-slate-300 text-lg">
+                {formatListeningTime(totalListeningTime)}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                Your personal listening time (saved locally)
+              </p>
+            </div>
+            <div className="border-t border-slate-700 pt-4">
+              <p className="mb-1 text-sm text-slate-400">
+                <span className="font-semibold text-white">Global Listening Time:</span>
+              </p>
+              {globalListeningTime !== null ? (
+                <>
+                  <p className="text-slate-300 text-lg">
+                    {formatListeningTime(globalListeningTime)}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Combined listening time from all users worldwide
+                  </p>
+                </>
+              ) : (
+                <p className="text-slate-400 text-sm">
+                  Loading...
+                </p>
+              )}
             </div>
           </div>
         </div>
