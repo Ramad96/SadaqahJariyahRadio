@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Radio } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Radio, Repeat } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 
 export default function Balcony({ 
@@ -12,7 +12,9 @@ export default function Balcony({
   progress, 
   duration,
   version,
-  onShowAbout
+  onShowAbout,
+  isReplayEnabled,
+  onReplayToggle
 }) {
   const textRef = useRef(null);
   const containerRef = useRef(null);
@@ -77,6 +79,19 @@ export default function Balcony({
               disabled={!currentSurah}
             >
               {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
+            </button>
+            
+            <button
+              onClick={onReplayToggle}
+              className={`p-2 rounded-full transition-all active:scale-95 ${
+                isReplayEnabled
+                  ? 'bg-white text-orange-500 hover:bg-white/90'
+                  : 'bg-white/20 hover:bg-white/30 text-white'
+              } disabled:opacity-40`}
+              aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
+              disabled={!currentSurah}
+            >
+              <Repeat size={18} />
             </button>
             
             <button

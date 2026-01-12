@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
 import { getGlobalListeningStats } from '../utils/supabase';
@@ -29,7 +29,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -142,11 +142,16 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   <p>This app features audio clips - specific verse ranges or segments of surahs. Each clip shows the verse range (e.g., 1-7) so you know which verses are included.</p>
                 </div>
                 <div>
+                  <h3 className="text-white font-semibold mb-2">Replay Button:</h3>
+                  <p>The replay button (🔄) appears next to the play/pause button when a recitation is selected. Click it to enable repeat mode, which will continuously loop the current recitation. Click again to disable repeat mode. When replay is enabled, the button will be highlighted.</p>
+                </div>
+                <div>
                   <h3 className="text-white font-semibold mb-2">Tips:</h3>
                   <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>Use the search bar to find surahs quickly</li>
                     <li>Enable "With audio only" to filter surahs that have available recordings</li>
                     <li>Enable "Auto play next" to automatically continue to the next surah</li>
+                    <li>Use the replay button to listen to a recitation on repeat</li>
                   </ul>
                 </div>
               </div>
@@ -482,43 +487,63 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     </button>
                   )}
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (hasAudio) {
-                      if (isActive) {
-                        onPlayPause();
-                      } else {
-                        onSurahSelect(surah);
-                      }
-                    }
-                  }}
-                  disabled={!hasAudio}
-                  className={`
-                    flex-shrink-0 p-2 rounded-xl transition-all
-                    ${!hasAudio 
-                      ? 'bg-slate-700 cursor-not-allowed' 
-                      : isActive 
-                        ? 'bg-white/20 hover:bg-white/30' 
-                        : 'bg-slate-800 hover:bg-slate-700'
-                    }
-                  `}
-                  aria-label={hasAudio ? (isActive && isPlaying ? 'Pause' : 'Play') : 'No audio available'}
-                >
-                  {isActive && isPlaying ? (
-                    <Pause 
-                      size={16} 
-                      className="text-white"
-                      fill="currentColor"
-                    />
-                  ) : (
-                    <Play 
-                      size={16} 
-                      className={!hasAudio ? 'text-slate-600' : isActive ? 'text-white' : 'text-slate-400'}
-                      fill={!hasAudio ? 'none' : isActive ? 'currentColor' : 'none'}
-                    />
+                <div className="flex-shrink-0 flex items-center gap-2">
+                  {isActive && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onReplayToggle();
+                      }}
+                      className={`
+                        p-2 rounded-xl transition-all
+                        ${isReplayEnabled
+                          ? 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
+                        }
+                      `}
+                      aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
+                    >
+                      <Repeat size={16} />
+                    </button>
                   )}
-                </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (hasAudio) {
+                        if (isActive) {
+                          onPlayPause();
+                        } else {
+                          onSurahSelect(surah);
+                        }
+                      }
+                    }}
+                    disabled={!hasAudio}
+                    className={`
+                      p-2 rounded-xl transition-all
+                      ${!hasAudio 
+                        ? 'bg-slate-700 cursor-not-allowed' 
+                        : isActive 
+                          ? 'bg-white/20 hover:bg-white/30' 
+                          : 'bg-slate-800 hover:bg-slate-700'
+                      }
+                    `}
+                    aria-label={hasAudio ? (isActive && isPlaying ? 'Pause' : 'Play') : 'No audio available'}
+                  >
+                    {isActive && isPlaying ? (
+                      <Pause 
+                        size={16} 
+                        className="text-white"
+                        fill="currentColor"
+                      />
+                    ) : (
+                      <Play 
+                        size={16} 
+                        className={!hasAudio ? 'text-slate-600' : isActive ? 'text-white' : 'text-slate-400'}
+                        fill={!hasAudio ? 'none' : isActive ? 'currentColor' : 'none'}
+                      />
+                    )}
+                  </button>
+                </div>
                 </div>
                 {isExpanded && surah.audioOptions && surah.audioOptions.length > 0 && (
                   <div className="px-4 pb-4 border-t border-slate-700/50 mt-2">

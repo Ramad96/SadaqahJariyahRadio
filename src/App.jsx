@@ -5,7 +5,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.8.0';
+const VERSION = '2.9.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -14,6 +14,7 @@ function App() {
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [isReplayEnabled, setIsReplayEnabled] = useState(false);
   const [selectedAudio, setSelectedAudio] = useState(() => {
     // Load from localStorage or default to "Default" for all surahs
     const saved = localStorage.getItem('selectedAudio');
@@ -40,6 +41,7 @@ function App() {
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
   const autoPlayNextRef = useRef(false);
+  const isReplayEnabledRef = useRef(false);
   const listeningTimeIntervalRef = useRef(null);
   const lastUpdateTimeRef = useRef(null);
   const accumulatedGlobalTimeRef = useRef(0); // Accumulate before sending to Supabase
@@ -170,6 +172,10 @@ function App() {
   }, [autoPlayNext]);
 
   useEffect(() => {
+    isReplayEnabledRef.current = isReplayEnabled;
+  }, [isReplayEnabled]);
+
+  useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
       
@@ -182,20 +188,24 @@ function App() {
       });
       
       audioRef.current.addEventListener('ended', () => {
-        setIsPlaying(false);
-        setProgress(0);
-        // Only auto-play next if the option is enabled
-        if (autoPlayNextRef.current && currentSurahRef.current) {
-          const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
-          // Find next surah with audio
-          let nextIndex = (currentIndex + 1) % surahs.length;
-          let attempts = 0;
-          while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
-            nextIndex = (nextIndex + 1) % surahs.length;
-            attempts++;
-          }
-          if (surahs[nextIndex].audioUrl) {
-            setCurrentSurah(surahs[nextIndex]);
+        // If replay is enabled, the audio will loop automatically
+        // Only handle ended event if replay is not enabled
+        if (!isReplayEnabledRef.current) {
+          setIsPlaying(false);
+          setProgress(0);
+          // Only auto-play next if the option is enabled
+          if (autoPlayNextRef.current && currentSurahRef.current) {
+            const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
+            // Find next surah with audio
+            let nextIndex = (currentIndex + 1) % surahs.length;
+            let attempts = 0;
+            while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
+              nextIndex = (nextIndex + 1) % surahs.length;
+              attempts++;
+            }
+            if (surahs[nextIndex].audioUrl) {
+              setCurrentSurah(surahs[nextIndex]);
+            }
           }
         }
       });
@@ -218,6 +228,7 @@ function App() {
       const audioUrl = getSurahAudioUrl(currentSurah);
       if (audioUrl) {
         audioRef.current.src = audioUrl;
+        audioRef.current.loop = isReplayEnabled;
         audioRef.current.load();
         setProgress(0);
         
@@ -228,7 +239,7 @@ function App() {
           });
       }
     }
-  }, [currentSurah, selectedAudio]);
+  }, [currentSurah, selectedAudio, isReplayEnabled]);
 
   const handleSurahSelect = (surah) => {
     const audioUrl = getSurahAudioUrl(surah);
@@ -262,6 +273,13 @@ function App() {
           setIsPlaying(false);
         });
     }
+  };
+
+  const handleReplayToggle = () => {
+    if (!audioRef.current) return;
+    const newReplayState = !isReplayEnabled;
+    setIsReplayEnabled(newReplayState);
+    audioRef.current.loop = newReplayState;
   };
 
   const handleNext = () => {
@@ -387,6 +405,8 @@ function App() {
         duration={duration}
         version={VERSION}
         onShowAbout={() => setShowAbout(true)}
+        isReplayEnabled={isReplayEnabled}
+        onReplayToggle={handleReplayToggle}
       />
       
       <SurahLibrary
@@ -403,6 +423,8 @@ function App() {
         onAudioSelect={handleAudioSelect}
         getSurahAudioUrl={getSurahAudioUrl}
         totalListeningTime={totalListeningTime}
+        isReplayEnabled={isReplayEnabled}
+        onReplayToggle={handleReplayToggle}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">
