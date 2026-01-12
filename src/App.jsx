@@ -5,7 +5,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.10.0';
+const VERSION = '2.11.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -228,9 +228,11 @@ function App() {
       const audioUrl = getSurahAudioUrl(currentSurah);
       if (audioUrl) {
         audioRef.current.src = audioUrl;
-        audioRef.current.loop = isReplayEnabled;
         audioRef.current.load();
         setProgress(0);
+        
+        // Set initial loop state
+        audioRef.current.loop = isReplayEnabled;
         
         audioRef.current.play()
           .then(() => setIsPlaying(true))
@@ -239,7 +241,15 @@ function App() {
           });
       }
     }
-  }, [currentSurah, selectedAudio, isReplayEnabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSurah, selectedAudio]);
+
+  // Update loop property when replay is toggled, without reloading the audio
+  useEffect(() => {
+    if (audioRef.current && currentSurah) {
+      audioRef.current.loop = isReplayEnabled;
+    }
+  }, [isReplayEnabled, currentSurah]);
 
   const handleSurahSelect = (surah) => {
     const audioUrl = getSurahAudioUrl(surah);
