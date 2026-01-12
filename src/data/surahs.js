@@ -19,6 +19,22 @@ const surahNames = [
   'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'
 ];
 
+// Arabic names for all 114 surahs
+const surahNamesArabic = [
+  'الفاتحة', 'البقرة', 'آل عمران', 'النساء', 'المائدة', 'الأنعام', 'الأعراف', 'الأنفال', 'التوبة', 'يونس',
+  'هود', 'يوسف', 'الرعد', 'إبراهيم', 'الحجر', 'النحل', 'الإسراء', 'الكهف', 'مريم', 'طه',
+  'الأنبياء', 'الحج', 'المؤمنون', 'النور', 'الفرقان', 'الشعراء', 'النمل', 'القصص', 'العنكبوت', 'الروم',
+  'لقمان', 'السجدة', 'الأحزاب', 'سبأ', 'فاطر', 'يس', 'الصافات', 'ص', 'الزمر', 'غافر',
+  'فصلت', 'الشورى', 'الزخرف', 'الدخان', 'الجاثية', 'الأحقاف', 'محمد', 'الفتح', 'الحجرات', 'ق',
+  'الذاريات', 'الطور', 'النجم', 'القمر', 'الرحمن', 'الواقعة', 'الحديد', 'المجادلة', 'الحشر', 'الممتحنة',
+  'الصف', 'الجمعة', 'المنافقون', 'التغابن', 'الطلاق', 'التحريم', 'الملك', 'القلم', 'الحاقة', 'المعارج',
+  'نوح', 'الجن', 'المزمل', 'المدثر', 'القيامة', 'الإنسان', 'المرسلات', 'النبأ', 'النازعات', 'عبس',
+  'التكوير', 'الإنفطار', 'المطففين', 'الانشقاق', 'البروج', 'الطارق', 'الأعلى', 'الغاشية', 'الفجر', 'البلد',
+  'الشمس', 'الليل', 'الضحى', 'الشرح', 'التين', 'العلق', 'القدر', 'البينة', 'الزلزلة', 'العاديات',
+  'القارعة', 'التكاثر', 'العصر', 'الهمزة', 'الفيل', 'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر',
+  'المسد', 'الإخلاص', 'الفلق', 'الناس'
+];
+
 // Number of ayahs (verses) for each surah
 const surahAyahCounts = [
   7, 286, 200, 176, 120, 165, 206, 75, 129, 109,
@@ -38,6 +54,7 @@ const surahAyahCounts = [
 export const surahs = Array.from({ length: 114 }, (_, i) => {
   const surahNumber = i + 1;
   const surahName = surahNames[i];
+  const surahNameArabic = surahNamesArabic[i];
   const baseUrl = import.meta.env.BASE_URL;
   
   // Construct folder path: {number}-{surahName}
@@ -75,7 +92,7 @@ export const surahs = Array.from({ length: 114 }, (_, i) => {
     id: surahNumber,
     number: surahNumber,
     name: `${surahNumber}. ${surahName}`,
-    nameArabic: `سورة ${surahNumber}`, // Placeholder - can be replaced with actual Arabic names
+    nameArabic: surahNameArabic,
     folderName: folderName,
     folderPath: folderPath,
     audioOptions: audioOptions,
@@ -86,19 +103,4 @@ export const surahs = Array.from({ length: 114 }, (_, i) => {
   };
 });
 
-// You can enhance this with actual Surah names later:
-// Example structure for future enhancement:
-/*
-export const surahs = [
-  {
-    id: 1,
-    number: 1,
-    name: "Al-Fatiha",
-    nameArabic: "الفاتحة",
-    audioUrl: "https://...",
-    additionalClips: []
-  },
-  // ... etc
-];
-*/
 
