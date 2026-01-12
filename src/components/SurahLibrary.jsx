@@ -439,12 +439,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   aria-label={hasAudio ? `Select ${surah.name}` : `${surah.name} (No audio available)`}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`
-                      text-[10px] font-bold uppercase tracking-widest
-                      ${isActive ? 'text-indigo-200' : 'text-slate-500'}
-                    `}>
-                      #{surah.number}
-                    </span>
                     {isActive && (
                       <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">
                         • PLAYING
@@ -455,16 +449,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     font-bold text-sm
                     ${!hasAudio ? 'text-slate-500' : isActive ? 'text-white' : 'text-white'}
                   `}>
-                    {surah.name}
+                    {surah.name}{surah.nameArabic ? ` | ${surah.nameArabic}` : ''}
                   </div>
-                  {surah.nameArabic && (
-                    <div className={`
-                      text-xs mt-0.5
-                      ${!hasAudio ? 'text-slate-600' : isActive ? 'text-indigo-100' : 'text-slate-400'}
-                    `}>
-                      {surah.nameArabic}
-                    </div>
-                  )}
                   {hasAudio && selectedOption && (
                     <button
                       onClick={(e) => {
