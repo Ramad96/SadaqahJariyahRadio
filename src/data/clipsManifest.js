@@ -18,12 +18,20 @@ export const clipsManifest = {
           "filename": "IbrahimAshShishani_154-157.mp3"
       },
       {
+          "filename": "SalehAljafarawi_155-157.mp3"
+      },
+      {
           "filename": "ShiekhMagdiOsman_285-285.mp3"
       }
   ],
   39: [
       {
           "filename": "IbrahimSow_74-75.mp3"
+      }
+  ],
+  41: [
+      {
+          "filename": "MuftiYaks_30-31.mp3"
       }
   ],
   67: [
