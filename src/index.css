@@ -37,20 +37,20 @@ body {
 }
 
 /* Custom scrollbar for verses display */
-.max-h-\[300px\]::-webkit-scrollbar {
+.overflow-y-auto::-webkit-scrollbar {
   width: 8px;
 }
 
-.max-h-\[300px\]::-webkit-scrollbar-track {
+.overflow-y-auto::-webkit-scrollbar-track {
   background: #1e293b;
   border-radius: 4px;
 }
 
-.max-h-\[300px\]::-webkit-scrollbar-thumb {
+.overflow-y-auto::-webkit-scrollbar-thumb {
   background: #475569;
   border-radius: 4px;
 }
 
-.max-h-\[300px\]::-webkit-scrollbar-thumb:hover {
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }

@@ -6,7 +6,17 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.16.0';
+const VERSION = '2.19.0';
+
+// Shuffle array function (Fisher-Yates algorithm)
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -31,10 +41,12 @@ function App() {
   const surahs = useMemo(() => {
     return baseSurahs.map(surah => {
       const clips = getClipsForSurah(surah.number, surah.folderName);
+      // Randomize the order of audio options for each surah
+      const randomizedClips = shuffleArray(clips);
       return {
         ...surah,
-        audioOptions: clips,
-        audioUrl: clips.length > 0 ? clips[0].url : null
+        audioOptions: randomizedClips,
+        audioUrl: randomizedClips.length > 0 ? randomizedClips[0].url : null
       };
     });
   }, []);
@@ -443,7 +455,7 @@ function App() {
         currentAudioOption={currentAudioOption}
       />
       
-      <footer className="w-full py-6 mt-8 border-t border-slate-800 pb-32">
+      <footer className="w-full py-6 mt-8 border-t border-slate-800 pb-[600px]">
         <div className="text-center text-slate-400 text-sm">
           Created by <span className="text-slate-300 font-semibold">AmanahDigital1447</span>
         </div>
