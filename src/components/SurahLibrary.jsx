@@ -38,10 +38,12 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
   const [showHelp, setShowHelp] = useState(false);
   const [globalListeningTime, setGlobalListeningTime] = useState(null); // null = loading, number = seconds
+  const [feedbackForm, setFeedbackForm] = useState({ subject: '', message: '' });
   const missionRef = useRef(null);
   const duaRef = useRef(null);
   const uploadRef = useRef(null);
   const statsRef = useRef(null);
+  const feedbackRef = useRef(null);
   const contentContainerRef = useRef(null);
   
   // Calculate the maximum height of all content sections
@@ -52,12 +54,13 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
       const duaHeight = duaRef.current?.scrollHeight || 0;
       const uploadHeight = uploadRef.current?.scrollHeight || 0;
       const statsHeight = statsRef.current?.scrollHeight || 0;
-      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight);
+      const feedbackHeight = feedbackRef.current?.scrollHeight || 0;
+      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight, feedbackHeight);
       if (maxHeight > 0) {
         setContentHeight(maxHeight);
       }
     }
-  }, [showAbout, totalListeningTime]);
+  }, [showAbout, totalListeningTime, feedbackForm]);
 
   // Fetch global listening stats on component mount and periodically
   useEffect(() => {
@@ -237,6 +240,16 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                 >
                   Stats
                 </button>
+                <button
+                  onClick={() => setAboutSection('feedback')}
+                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
+                    aboutSection === 'feedback'
+                      ? 'text-white border-b-2 border-indigo-500'
+                      : 'text-slate-400 hover:text-slate-300'
+                  }`}
+                >
+                  Feedback
+                </button>
               </div>
               
               {/* Section Content */}
@@ -297,6 +310,45 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                         </p>
                       </div>
                     </div>
+                  </div>
+                </div>
+                
+                <div ref={feedbackRef} className="absolute opacity-0 pointer-events-none invisible">
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
+                    <p className="mb-4 text-slate-300">
+                      If you encounter any issues with the website or have feedback, please fill out the form below. This will open your email client to send a message to us.
+                    </p>
+                    <form className="space-y-4">
+                      <div>
+                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">
+                          Subject
+                        </label>
+                        <input
+                          type="text"
+                          id="feedback-subject"
+                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Brief description of the issue"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">
+                          Message
+                        </label>
+                        <textarea
+                          id="feedback-message"
+                          rows={5}
+                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                          placeholder="Please describe the issue or provide your feedback..."
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all"
+                      >
+                        Send Feedback
+                      </button>
+                    </form>
                   </div>
                 </div>
                 
@@ -362,6 +414,62 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                         )}
                       </div>
                     </div>
+                  </div>
+                )}
+                
+                {aboutSection === 'feedback' && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
+                    <p className="mb-4 text-slate-300">
+                      If you encounter any issues with the website or have feedback, please fill out the form below. This will open your email client to send a message to us.
+                    </p>
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const subject = encodeURIComponent(feedbackForm.subject || 'Website Feedback');
+                        const body = encodeURIComponent(
+                          `Subject: ${feedbackForm.subject || 'Website Feedback'}\n\n` +
+                          `Message:\n${feedbackForm.message}`
+                        );
+                        const email = 'amanahdigital1447@gmail.com';
+                        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                      }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">
+                          Subject
+                        </label>
+                        <input
+                          type="text"
+                          id="feedback-subject"
+                          value={feedbackForm.subject}
+                          onChange={(e) => setFeedbackForm({ ...feedbackForm, subject: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          placeholder="Brief description of the issue"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">
+                          Message
+                        </label>
+                        <textarea
+                          id="feedback-message"
+                          rows={5}
+                          value={feedbackForm.message}
+                          onChange={(e) => setFeedbackForm({ ...feedbackForm, message: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                          placeholder="Please describe the issue or provide your feedback..."
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all"
+                      >
+                        Send Feedback
+                      </button>
+                    </form>
                   </div>
                 )}
               </div>

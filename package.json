@@ -1,7 +1,7 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.12.0",
+  "version": "2.13.0",
   "type": "module",
   "scripts": {
     "dev": "npm run generate-manifest && vite",
@@ -13,6 +13,7 @@
     "fetch-verses": "node scripts/fetchVersesFromAPI.js"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@supabase/supabase-js": "^2.90.1",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
