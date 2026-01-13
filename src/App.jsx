@@ -6,7 +6,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.19.0';
+const VERSION = '2.20.0';
 
 // Shuffle array function (Fisher-Yates algorithm)
 function shuffleArray(array) {
