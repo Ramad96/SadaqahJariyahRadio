@@ -3,6 +3,7 @@ import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, F
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
 import { getGlobalListeningStats } from '../utils/supabase';
+import VersesDisplay from './VersesDisplay';
 
 // Format listening time in seconds to a human-readable string
 function formatListeningTime(seconds) {
@@ -29,7 +30,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -151,7 +152,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
 
   return (
-    <main className="pt-20 pb-[400px] md:pb-[400px] px-4 min-h-screen bg-slate-950">
+    <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center py-1">
           <h1 className="text-2xl font-black text-white italic tracking-tighter mb-0.5 flex items-center justify-center gap-2">
@@ -807,6 +808,12 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
             </div>
           </div>
         </div>
+        
+        {/* Verses Display Section */}
+        <VersesDisplay
+          currentSurah={currentSurah}
+          currentAudioOption={currentAudioOption}
+        />
         
         {/* Listening Statistics Section */}
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">

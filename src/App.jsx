@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
-import VersesDisplay from './components/VersesDisplay';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.21.0';
+const VERSION = '2.21.1';
 
 // Shuffle array function (Fisher-Yates algorithm)
 function shuffleArray(array) {
@@ -448,14 +447,10 @@ function App() {
         totalListeningTime={totalListeningTime}
         isReplayEnabled={isReplayEnabled}
         onReplayToggle={handleReplayToggle}
-      />
-      
-      <VersesDisplay
-        currentSurah={currentSurah}
         currentAudioOption={currentAudioOption}
       />
       
-      <footer className="w-full py-6 mt-8 border-t border-slate-800 pb-[400px] md:pb-[400px]">
+      <footer className="w-full py-6 mt-8 border-t border-slate-800">
         <div className="text-center text-slate-400 text-sm">
           Created by <span className="text-slate-300 font-semibold">AmanahDigital1447</span>
         </div>

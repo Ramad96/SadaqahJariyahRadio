@@ -52,10 +52,10 @@ export default function VersesDisplay({ currentSurah, currentAudioOption }) {
 
   if (!isVisible) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 border-t-2 border-slate-700 shadow-2xl">
+      <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
         <button
           onClick={() => setIsVisible(true)}
-          className="w-full px-4 py-2 flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+          className="w-full px-4 py-2 flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors rounded-xl"
           aria-label="Show verses"
         >
           <ChevronUp size={18} />
@@ -66,9 +66,9 @@ export default function VersesDisplay({ currentSurah, currentAudioOption }) {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 border-t-2 border-slate-700 shadow-2xl h-[300px] md:h-[400px]">
+    <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
       {/* Header with Hide Button */}
-      <div className="border-b border-slate-700 flex items-center justify-between px-4 py-2">
+      <div className="border-b border-slate-700 flex items-center justify-between pb-3 mb-4">
         <div className="flex-1">
           <h2 className="text-white font-bold text-lg">
             {currentSurah.name}
@@ -91,7 +91,7 @@ export default function VersesDisplay({ currentSurah, currentAudioOption }) {
         </button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-4 h-[calc(100%-80px)] overflow-y-auto">
+      <div className="max-h-[400px] overflow-y-auto">
         <div className="space-y-4">
           {verses.map((verse) => (
             <div key={verse.number} className="flex gap-3 items-start">

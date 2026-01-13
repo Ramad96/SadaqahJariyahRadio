@@ -1,7 +1,7 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.21.0",
+  "version": "2.21.1",
   "type": "module",
   "scripts": {
     "dev": "npm run generate-manifest && npm run fetch-verses && vite",
