@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 body {
@@ -27,4 +28,29 @@ body {
   animation: scroll 40s linear infinite;
   display: inline-block;
   padding-right: 50px;
+}
+
+.font-arabic {
+  font-family: 'Amiri', 'Noto Sans Arabic', serif;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Custom scrollbar for verses display */
+.max-h-\[300px\]::-webkit-scrollbar {
+  width: 8px;
+}
+
+.max-h-\[300px\]::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.max-h-\[300px\]::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.max-h-\[300px\]::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }

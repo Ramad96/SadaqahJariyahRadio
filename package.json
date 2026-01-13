@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-manifest": "node scripts/generateAudioManifest.js",
-    "generate-verses": "node scripts/generateVersesData.js"
+    "generate-verses": "node scripts/generateVersesData.js",
+    "fetch-verses": "node scripts/fetchVersesFromAPI.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
