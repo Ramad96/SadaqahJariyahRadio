@@ -6,7 +6,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.13.0';
+const VERSION = '2.14.0';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);

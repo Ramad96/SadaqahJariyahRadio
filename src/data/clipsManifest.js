@@ -21,6 +21,11 @@ export const clipsManifest = {
           "filename": "ShiekhMagdiOsman_285-285.mp3"
       }
   ],
+  39: [
+      {
+          "filename": "IbrahimSow_74-75.mp3"
+      }
+  ],
   67: [
       {
           "filename": "ShiekhMagdiOsman_12-19.mp3"

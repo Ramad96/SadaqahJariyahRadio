@@ -1,11 +1,11 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.13.0",
+  "version": "2.14.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run generate-manifest && vite",
-    "build": "npm run generate-manifest && vite build",
+    "dev": "npm run generate-manifest && npm run fetch-verses && vite",
+    "build": "npm run generate-manifest && npm run fetch-verses && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-manifest": "node scripts/generateAudioManifest.js",
