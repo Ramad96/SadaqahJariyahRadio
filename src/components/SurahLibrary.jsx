@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
 import { getGlobalListeningStats } from '../utils/supabase';
@@ -39,6 +39,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const [showHelp, setShowHelp] = useState(false);
   const [globalListeningTime, setGlobalListeningTime] = useState(null); // null = loading, number = seconds
   const [feedbackForm, setFeedbackForm] = useState({ subject: '', message: '' });
+  const [selectedReciterFilter, setSelectedReciterFilter] = useState('all'); // 'all' or reciter name
+  const [showReciterFilter, setShowReciterFilter] = useState(false);
   const missionRef = useRef(null);
   const duaRef = useRef(null);
   const uploadRef = useRef(null);
@@ -85,22 +87,68 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
     return () => clearInterval(interval);
   }, []);
 
-  const filteredSurahs = surahs.filter((surah) => {
-    // Filter by audio availability if checkbox is checked
-    const audioUrl = getSurahAudioUrl(surah);
-    if (showOnlyWithAudio && !audioUrl) {
-      return false;
-    }
-    
-    // Filter by search query
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      surah.name.toLowerCase().includes(query) ||
-      surah.number.toString().includes(query) ||
-      (surah.nameArabic && surah.nameArabic.includes(query))
-    );
-  });
+  // Extract all unique reciter names from all surahs
+  const allReciters = useMemo(() => {
+    const reciterSet = new Set();
+    surahs.forEach(surah => {
+      if (surah.audioOptions) {
+        surah.audioOptions.forEach(option => {
+          const reciterName = option.reciter || option.name;
+          if (reciterName) {
+            reciterSet.add(reciterName);
+          }
+        });
+      }
+    });
+    return Array.from(reciterSet).sort();
+  }, [surahs]);
+
+  // Filter surahs and their audio options based on selected reciter
+  const filteredSurahs = useMemo(() => {
+    return surahs.map(surah => {
+      // Filter audio options if a reciter is selected
+      let filteredAudioOptions = surah.audioOptions || [];
+      if (selectedReciterFilter !== 'all') {
+        filteredAudioOptions = (surah.audioOptions || []).filter(option => {
+          const reciterName = option.reciter || option.name;
+          return reciterName === selectedReciterFilter;
+        });
+      }
+
+      // Get audio URL from filtered options or use original getSurahAudioUrl if all reciters
+      let audioUrl = null;
+      if (filteredAudioOptions.length > 0) {
+        const selectedOptionName = selectedAudio[surah.id];
+        const selectedOption = selectedOptionName 
+          ? filteredAudioOptions.find(opt => opt.name === selectedOptionName) 
+          : null;
+        const option = selectedOption || filteredAudioOptions[0];
+        audioUrl = option?.url || null;
+      } else if (selectedReciterFilter === 'all') {
+        audioUrl = getSurahAudioUrl(surah);
+      }
+
+      return {
+        ...surah,
+        audioOptions: filteredAudioOptions,
+        audioUrl: audioUrl
+      };
+    }).filter((surah) => {
+      // Filter by audio availability if checkbox is checked
+      if (showOnlyWithAudio && !surah.audioUrl) {
+        return false;
+      }
+      
+      // Filter by search query
+      if (!searchQuery.trim()) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        surah.name.toLowerCase().includes(query) ||
+        surah.number.toString().includes(query) ||
+        (surah.nameArabic && surah.nameArabic.includes(query))
+      );
+    });
+  }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
 
   return (
     <main className="pt-20 pb-96 px-4 min-h-screen bg-slate-950">
@@ -504,6 +552,72 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
               Auto play next
             </button>
           </div>
+          
+          {/* Reciter Filter */}
+          <div className="mb-4 relative">
+            <button
+              onClick={() => setShowReciterFilter(!showReciterFilter)}
+              className={`
+                w-full px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between gap-2
+                ${selectedReciterFilter !== 'all'
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }
+              `}
+            >
+              <span className="flex items-center gap-2">
+                <Filter size={14} />
+                {selectedReciterFilter === 'all' ? 'All Reciters' : selectedReciterFilter}
+              </span>
+              <ChevronDown size={14} className={showReciterFilter ? 'rotate-180' : ''} />
+            </button>
+            
+            {showReciterFilter && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowReciterFilter(false)}
+                />
+                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto">
+                  <div className="p-2 space-y-1">
+                    <button
+                      onClick={() => {
+                        setSelectedReciterFilter('all');
+                        setShowReciterFilter(false);
+                      }}
+                      className={`
+                        w-full px-3 py-2 rounded-lg text-sm text-left transition-all
+                        ${selectedReciterFilter === 'all'
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                        }
+                      `}
+                    >
+                      All Reciters
+                    </button>
+                    {allReciters.map((reciter) => (
+                      <button
+                        key={reciter}
+                        onClick={() => {
+                          setSelectedReciterFilter(reciter);
+                          setShowReciterFilter(false);
+                        }}
+                        className={`
+                          w-full px-3 py-2 rounded-lg text-sm text-left transition-all
+                          ${selectedReciterFilter === reciter
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }
+                        `}
+                      >
+                        {reciter}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
             <input
@@ -518,7 +632,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
             <div className="space-y-2">
               {filteredSurahs.map((surah) => {
             const isActive = currentSurah?.id === surah.id;
-            const audioUrl = getSurahAudioUrl(surah);
+            const audioUrl = surah.audioUrl;
             const hasAudio = audioUrl !== null;
             // Get selected audio option name, defaulting to first available option
             const selectedAudioKey = selectedAudio[surah.id];

@@ -7,6 +7,9 @@ import { parseClipFilename } from '../utils/clipParser';
 export const clipsManifest = {
   1: [
       {
+          "filename": "SalehAljafarawi_1-7.mp3"
+      },
+      {
           "filename": "SheikhFouadSaeedAbdulkadir_1-7.mp3"
       },
       {
@@ -18,10 +21,41 @@ export const clipsManifest = {
           "filename": "IbrahimAshShishani_154-157.mp3"
       },
       {
-          "filename": "SalehAljafarawi_155-157.mp3"
+          "filename": "SalehAljafarawi_153-157.mp3"
+      },
+      {
+          "filename": "SalehAljafarawi_285-286.mp3"
       },
       {
           "filename": "ShiekhMagdiOsman_285-285.mp3"
+      }
+  ],
+  4: [
+      {
+          "filename": "SalehAljafarawi_104-104.mp3"
+      }
+  ],
+  14: [
+      {
+          "filename": "SalehAljafarawi_42-42.mp3"
+      }
+  ],
+  17: [
+      {
+          "filename": "SalehAljafarawi_4-7.mp3"
+      }
+  ],
+  19: [
+      {
+          "filename": "SalehAljafarawi_1-11.mp3"
+      },
+      {
+          "filename": "SalehAljafarawi_28-38.mp3"
+      }
+  ],
+  24: [
+      {
+          "filename": "SalehAljafarawi_36-38.mp3"
       }
   ],
   39: [
@@ -77,6 +111,11 @@ export const clipsManifest = {
   109: [
       {
           "filename": "ShiekhMagdiOsman_1-6.mp3"
+      }
+  ],
+  110: [
+      {
+          "filename": "SalehAljafarawi_1-3.mp3"
       }
   ],
 };
