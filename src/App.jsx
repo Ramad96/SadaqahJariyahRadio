@@ -6,7 +6,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.20.0';
+const VERSION = '2.21.0';
 
 // Shuffle array function (Fisher-Yates algorithm)
 function shuffleArray(array) {
@@ -455,7 +455,7 @@ function App() {
         currentAudioOption={currentAudioOption}
       />
       
-      <footer className="w-full py-6 mt-8 border-t border-slate-800 pb-[600px]">
+      <footer className="w-full py-6 mt-8 border-t border-slate-800 pb-[400px] md:pb-[400px]">
         <div className="text-center text-slate-400 text-sm">
           Created by <span className="text-slate-300 font-semibold">AmanahDigital1447</span>
         </div>

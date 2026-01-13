@@ -151,7 +151,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
 
   return (
-    <main className="pt-20 pb-[600px] px-4 min-h-screen bg-slate-950">
+    <main className="pt-20 pb-[400px] md:pb-[400px] px-4 min-h-screen bg-slate-950">
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center py-1">
           <h1 className="text-2xl font-black text-white italic tracking-tighter mb-0.5 flex items-center justify-center gap-2">
