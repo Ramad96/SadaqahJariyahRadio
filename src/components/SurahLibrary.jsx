@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter, Shuffle } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
 import { getGlobalListeningStats } from '../utils/supabase';
@@ -30,7 +30,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -186,24 +186,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
               </div>
               <div className="text-slate-300 text-sm leading-relaxed space-y-4">
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Selecting a Reciter:</h3>
-                  <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio clips with specific verse ranges.</p>
-                </div>
-                <div>
                   <h3 className="text-white font-semibold mb-2">About Clips:</h3>
                   <p>This app features audio clips - specific verse ranges or segments of surahs. Each clip shows the verse range (e.g., 1-7) so you know which verses are included.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Replay Button:</h3>
-                  <p>The replay button (🔄) appears next to the play/pause button when a recitation is selected. Click it to enable repeat mode, which will continuously loop the current recitation. Click again to disable repeat mode. When replay is enabled, the button will be highlighted.</p>
+                  <h3 className="text-white font-semibold mb-2">Selecting a Reciter:</h3>
+                  <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio clips with specific verse ranges.</p>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-2">Reciter Filter:</h3>
+                  <p>Use the filter button (with the filter icon) above the search bar to filter all surahs by a specific reciter. This will show only surahs that have recordings from the selected reciter. Select "All Reciters" to see all available surahs again.</p>
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold mb-2">Verses Display:</h3>
+                  <p>When you select a recitation with a verse range, the verses section will appear below the surah list showing the Arabic text of those verses. You can collapse or expand this section using the chevron button. The verses are displayed with their verse numbers for easy reference.</p>
                 </div>
                 <div>
                   <h3 className="text-white font-semibold mb-2">Tips:</h3>
                   <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>Use the search bar to find surahs quickly</li>
                     <li>Enable "With audio only" to filter surahs that have available recordings</li>
+                    <li>Use the reciter filter to browse surahs by a specific reciter</li>
                     <li>Enable "Auto play next" to automatically continue to the next surah</li>
-                    <li>Use the replay button to listen to a recitation on repeat</li>
+                    <li>View the verses section to read along with the recitation</li>
                   </ul>
                 </div>
               </div>
@@ -527,6 +532,15 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         )}
         
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+          <div className="mb-4">
+            <button
+              onClick={onPlayRandom}
+              className="w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg flex items-center justify-center gap-2 mb-4"
+            >
+              <Shuffle size={18} />
+              Play Random
+            </button>
+          </div>
           <div className="mb-4 flex gap-2">
             <button
               onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}

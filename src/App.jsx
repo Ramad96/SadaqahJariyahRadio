@@ -5,17 +5,7 @@ import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 
-const VERSION = '2.21.1';
-
-// Shuffle array function (Fisher-Yates algorithm)
-function shuffleArray(array) {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
+const VERSION = '2.21.2';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
@@ -36,19 +26,45 @@ function App() {
     return saved ? parseFloat(saved) : 0;
   });
   
-  // Always use clips mode
+  // Always use clips mode - keep list in order, randomly select one per surah
   const surahs = useMemo(() => {
     return baseSurahs.map(surah => {
       const clips = getClipsForSurah(surah.number, surah.folderName);
-      // Randomize the order of audio options for each surah
-      const randomizedClips = shuffleArray(clips);
+      // Keep clips in original order (no randomization)
       return {
         ...surah,
-        audioOptions: randomizedClips,
-        audioUrl: randomizedClips.length > 0 ? randomizedClips[0].url : null
+        audioOptions: clips,
+        audioUrl: clips.length > 0 ? clips[0].url : null
       };
     });
   }, []);
+
+  // Initialize random selection for surahs that don't have a saved selection
+  useEffect(() => {
+    const saved = localStorage.getItem('selectedAudio');
+    const savedSelections = saved ? JSON.parse(saved) : {};
+    
+    // Check if we need to initialize any random selections
+    const needsInitialization = surahs.some(surah => {
+      if (!surah.audioOptions || surah.audioOptions.length === 0) return false;
+      return !savedSelections[surah.id];
+    });
+
+    if (needsInitialization) {
+      const newSelections = { ...savedSelections };
+      surahs.forEach(surah => {
+        if (surah.audioOptions && surah.audioOptions.length > 0 && !newSelections[surah.id]) {
+          // Randomly select one option from the list
+          const randomIndex = Math.floor(Math.random() * surah.audioOptions.length);
+          const randomOption = surah.audioOptions[randomIndex];
+          newSelections[surah.id] = randomOption.name;
+        }
+      });
+      setSelectedAudio(newSelections);
+      localStorage.setItem('selectedAudio', JSON.stringify(newSelections));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
   
   const audioRef = useRef(null);
   const currentSurahRef = useRef(null);
@@ -282,6 +298,32 @@ function App() {
     }
   };
 
+  const handlePlayRandom = () => {
+    // Filter surahs that have audio options
+    const surahsWithAudio = surahs.filter(surah => 
+      surah.audioOptions && surah.audioOptions.length > 0
+    );
+
+    if (surahsWithAudio.length === 0) return;
+
+    // Randomly select a surah
+    const randomSurahIndex = Math.floor(Math.random() * surahsWithAudio.length);
+    const randomSurah = surahsWithAudio[randomSurahIndex];
+
+    // Randomly select a reciter/audio option from that surah
+    const randomOptionIndex = Math.floor(Math.random() * randomSurah.audioOptions.length);
+    const randomOption = randomSurah.audioOptions[randomOptionIndex];
+
+    // Set the selected audio for this surah
+    setSelectedAudio(prev => ({
+      ...prev,
+      [randomSurah.id]: randomOption.name
+    }));
+
+    // Set and play the surah
+    setCurrentSurah(randomSurah);
+  };
+
   const handlePlayPause = () => {
     if (!audioRef.current || !currentSurah) return;
 
@@ -448,6 +490,7 @@ function App() {
         isReplayEnabled={isReplayEnabled}
         onReplayToggle={handleReplayToggle}
         currentAudioOption={currentAudioOption}
+        onPlayRandom={handlePlayRandom}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">
