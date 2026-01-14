@@ -47,6 +47,11 @@ export default function Balcony({
       className="fixed top-0 left-0 right-0 z-50 bg-orange-500 shadow-lg"
       role="banner"
     >
+      {/* Version number in corner */}
+      <div className="absolute top-0.5 right-1 z-10">
+        <span className="text-white/60 font-normal text-[10px]">v{version}</span>
+      </div>
+      
       <div className="px-4 py-4">
         <div className="flex items-center justify-between relative">
           {/* Left: Surah Name */}
@@ -113,7 +118,6 @@ export default function Balcony({
             >
               About Us
             </button>
-            <span className="text-white/80 font-normal text-xs ml-2">v{version}</span>
           </div>
         </div>
       </div>
