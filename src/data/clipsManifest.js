@@ -27,6 +27,9 @@ export const clipsManifest = {
           "filename": "SalehAljafarawi_285-286.mp3"
       },
       {
+          "filename": "ShiekhMagdiOsman_108-109.mp3"
+      },
+      {
           "filename": "ShiekhMagdiOsman_285-285.mp3"
       }
   ],
@@ -68,6 +71,11 @@ export const clipsManifest = {
           "filename": "MuftiYaks_30-31.mp3"
       }
   ],
+  59: [
+      {
+          "filename": "ShiekhMagdiOsman_22-24.mp3"
+      }
+  ],
   67: [
       {
           "filename": "ShiekhMagdiOsman_12-19.mp3"
@@ -81,6 +89,11 @@ export const clipsManifest = {
   75: [
       {
           "filename": "ZaydDesai_31-40.mp3"
+      }
+  ],
+  79: [
+      {
+          "filename": "ShiekhMagdiOsman_4-14.mp3"
       }
   ],
   81: [
@@ -103,6 +116,11 @@ export const clipsManifest = {
           "filename": "ShiekhMagdiOsman_1-19.mp3"
       }
   ],
+  88: [
+      {
+          "filename": "ShiekhMagdiOsman_1-17.mp3"
+      }
+  ],
   104: [
       {
           "filename": "ShiekhMagdiOsman_1-9.mp3"
@@ -116,6 +134,9 @@ export const clipsManifest = {
   110: [
       {
           "filename": "SalehAljafarawi_1-3.mp3"
+      },
+      {
+          "filename": "ShiekhMagdiOsman_1-3.mp3"
       }
   ],
 };
