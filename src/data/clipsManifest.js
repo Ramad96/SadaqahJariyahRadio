@@ -7,6 +7,12 @@ import { parseClipFilename } from '../utils/clipParser';
 export const clipsManifest = {
   1: [
       {
+          "filename": "AbdullahAhmed_1-7.mp3"
+      },
+      {
+          "filename": "KhumaiAhmedMalik_1-7.mp3"
+      },
+      {
           "filename": "SalehAljafarawi_1-7.mp3"
       },
       {
@@ -14,11 +20,26 @@ export const clipsManifest = {
       },
       {
           "filename": "ShiekhMagdiOsman_1-7.mp3"
+      },
+      {
+          "filename": "YusufAlDibyan_1-7.mp3"
       }
   ],
   2: [
       {
+          "filename": "AbdullahAhmed_182-182.mp3"
+      },
+      {
           "filename": "IbrahimAshShishani_154-157.mp3"
+      },
+      {
+          "filename": "KhumaiAhmedMalik_135-144.mp3"
+      },
+      {
+          "filename": "Malik1_284-285.mp3"
+      },
+      {
+          "filename": "OmarBarzak_1-3.mp3"
       },
       {
           "filename": "SalehAljafarawi_153-157.mp3"
@@ -66,6 +87,14 @@ export const clipsManifest = {
           "filename": "SalehAljafarawi_28-38.mp3"
       }
   ],
+  20: [
+      {
+          "filename": "FahadAlDoussari_82-84.mp3"
+      },
+      {
+          "filename": "MohammadAyyoub_105-114.mp3"
+      }
+  ],
   24: [
       {
           "filename": "SalehAljafarawi_36-38.mp3"
@@ -73,7 +102,23 @@ export const clipsManifest = {
   ],
   25: [
       {
+          "filename": "AbdulRahmanFalantinu_27-29.mp3"
+      },
+      {
           "filename": "DanyaalAsgharAli_71-73.mp3"
+      }
+  ],
+  36: [
+      {
+          "filename": "Abdulhamid1_55-58.mp3"
+      },
+      {
+          "filename": "MuhammadAlHanawi_78-79.mp3"
+      }
+  ],
+  37: [
+      {
+          "filename": "MohammadAyyoub_178-182.mp3"
       }
   ],
   39: [
@@ -92,6 +137,9 @@ export const clipsManifest = {
       }
   ],
   59: [
+      {
+          "filename": "NoreenMohammed_22-24.mp3"
+      },
       {
           "filename": "ShiekhMagdiOsman_22-24.mp3"
       }
@@ -147,6 +195,11 @@ export const clipsManifest = {
   88: [
       {
           "filename": "ShiekhMagdiOsman_1-17.mp3"
+      }
+  ],
+  93: [
+      {
+          "filename": "Abdullah1_11-11.mp3"
       }
   ],
   104: [
