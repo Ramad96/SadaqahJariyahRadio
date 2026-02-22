@@ -71,6 +71,9 @@ export const clipsManifest = {
   ],
   14: [
       {
+          "filename": "MohammadAyoub_45-46.mp3"
+      },
+      {
           "filename": "SalehAljafarawi_42-42.mp3"
       }
   ],
@@ -80,6 +83,9 @@ export const clipsManifest = {
       }
   ],
   19: [
+      {
+          "filename": "MohammadNoorAlsagheer_18-23.mp3"
+      },
       {
           "filename": "SalehAljafarawi_1-11.mp3"
       },
@@ -134,6 +140,11 @@ export const clipsManifest = {
   47: [
       {
           "filename": "AdullahAlzein_36-38.mp3"
+      }
+  ],
+  56: [
+      {
+          "filename": "AzizAli_18-26.mp3"
       }
   ],
   59: [
@@ -218,6 +229,11 @@ export const clipsManifest = {
       },
       {
           "filename": "ShiekhMagdiOsman_1-3.mp3"
+      }
+  ],
+  112: [
+      {
+          "filename": "ShkSilimanKasule_1-4.mp3"
       }
   ],
 };
