@@ -2,8 +2,10 @@
 //
 // Steps:
 //   1. Generate audio manifest  — always runs (reflects current audio files on disk)
-//   2. Check verse coverage     — compares audio files against existing verse data
+//   2. Check verse coverage     — compares audio files against existing Arabic verse data
 //   3. Fetch verses from API    — only runs if step 2 finds gaps
+//   4. Check translation coverage — compares audio files against verses_translation_en.js
+//   5. Fetch translations from API — only runs if step 4 finds gaps
 //
 // Usage:
 //   node scripts/setup.js
@@ -78,6 +80,21 @@ function setup() {
     printSkipped('all verse data is already complete');
   } else {
     run('node scripts/fetchVersesFromAPI.js');
+  }
+
+  // Step 4: Translation coverage check
+  // Compares the audio manifest against verses_translation_en.js to find gaps.
+  printStep(4, 'Check translation coverage');
+  const translationsComplete = runCheck('node scripts/checkTranslations.js');
+
+  // Step 5: Fetch missing translations
+  // Only calls the Quran.com API if step 4 found translations that are missing.
+  // Skipped entirely when everything is already present.
+  printStep(5, 'Fetch missing translations from Quran.com API');
+  if (translationsComplete) {
+    printSkipped('all translation data is already complete');
+  } else {
+    run('node scripts/fetchTranslationsFromAPI.js');
   }
 
   printHeader('Setup complete');

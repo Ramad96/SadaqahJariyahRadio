@@ -1,7 +1,7 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.24.1",
+  "version": "2.24.2",
   "type": "module",
   "scripts": {
     "dev": "npm run setup && vite",
@@ -13,7 +13,9 @@
     "generate-manifest": "node scripts/generateAudioManifest.js",
     "generate-verses": "node scripts/generateVersesData.js",
     "check-verses": "node scripts/checkVerses.js",
-    "fetch-verses": "node scripts/fetchVersesFromAPI.js"
+    "fetch-verses": "node scripts/fetchVersesFromAPI.js",
+    "check-translations": "node scripts/checkTranslations.js",
+    "fetch-translations": "node scripts/fetchTranslationsFromAPI.js"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
