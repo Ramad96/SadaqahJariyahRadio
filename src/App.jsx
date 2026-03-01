@@ -27,6 +27,9 @@ function App() {
   const [scriptType, setScriptType] = useState(() =>
     localStorage.getItem('scriptType') || 'uthmani'
   );
+  const [showTranslation, setShowTranslation] = useState(() =>
+    localStorage.getItem('showTranslation') !== 'false'
+  );
   
   // Always use clips mode - keep list in order, randomly select one per surah
   const surahs = useMemo(() => {
@@ -90,6 +93,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('scriptType', scriptType);
   }, [scriptType]);
+
+  // Save translation visibility preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('showTranslation', showTranslation.toString());
+  }, [showTranslation]);
 
   // Track listening time when audio is playing
   useEffect(() => {
@@ -500,6 +508,8 @@ function App() {
         onPlayRandom={handlePlayRandom}
         scriptType={scriptType}
         onScriptTypeChange={setScriptType}
+        showTranslation={showTranslation}
+        onShowTranslationChange={setShowTranslation}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">

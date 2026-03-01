@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getVerse as getVerseUthmani } from '../data/verses_uthmani';
 import { getVerse as getVerseIndopak } from '../data/verses_indopak';
+import { getVerse as getVerseTranslation } from '../data/verses_translation_en';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
@@ -23,7 +24,7 @@ function parseRange(range) {
   return verses;
 }
 
-export default function VersesDisplay({ currentSurah, currentAudioOption, scriptType = 'uthmani' }) {
+export default function VersesDisplay({ currentSurah, currentAudioOption, scriptType = 'uthmani', showTranslation = true }) {
   const getVerse = scriptType === 'indopak' ? getVerseIndopak : getVerseUthmani;
   const [isVisible, setIsVisible] = useState(() => {
     // Load saved visibility state from localStorage, default to true
@@ -104,6 +105,11 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
                 <p className="text-white text-xl leading-relaxed font-arabic">
                   {verse.text}
                 </p>
+                {showTranslation && getVerseTranslation(currentSurah.number, verse.number) && (
+                  <p className="text-slate-400 text-sm leading-relaxed mt-2">
+                    {getVerseTranslation(currentSurah.number, verse.number)}
+                  </p>
+                )}
               </div>
               <div className="flex-shrink-0">
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold">

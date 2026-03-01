@@ -30,7 +30,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom, scriptType, onScriptTypeChange }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom, scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -581,6 +581,22 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     </button>
                   </div>
                 </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Translation</h3>
+                  <button
+                    onClick={() => onShowTranslationChange(!showTranslation)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-all"
+                  >
+                    <div className="text-left">
+                      <div className="text-sm font-semibold text-white">English Translation</div>
+                      <div className="text-xs text-slate-400 mt-0.5">Saheeh International</div>
+                    </div>
+                    <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${showTranslation ? 'bg-indigo-600' : 'bg-slate-600'}`}>
+                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${showTranslation ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -883,6 +899,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
           currentSurah={currentSurah}
           currentAudioOption={currentAudioOption}
           scriptType={scriptType}
+          showTranslation={showTranslation}
         />
         
       </div>
