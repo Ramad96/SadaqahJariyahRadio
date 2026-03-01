@@ -47,6 +47,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
   const uploadRef = useRef(null);
   const statsRef = useRef(null);
   const feedbackRef = useRef(null);
+  const iosRef = useRef(null);
   const contentContainerRef = useRef(null);
   
   // Calculate the maximum height of all content sections
@@ -58,7 +59,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
       const uploadHeight = uploadRef.current?.scrollHeight || 0;
       const statsHeight = statsRef.current?.scrollHeight || 0;
       const feedbackHeight = feedbackRef.current?.scrollHeight || 0;
-      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight, feedbackHeight);
+      const iosHeight = iosRef.current?.scrollHeight || 0;
+      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight, feedbackHeight, iosHeight);
       if (maxHeight > 0) {
         setContentHeight(maxHeight);
       }
@@ -265,14 +267,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   Mission
                 </button>
                 <button
-                  onClick={() => setAboutSection('dua')}
+                  onClick={() => setAboutSection('homescreen')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'dua'
+                    aboutSection === 'homescreen'
                       ? 'text-white border-b-2 border-indigo-500'
                       : 'text-slate-400 hover:text-slate-300'
                   }`}
                 >
-                  Dua
+                  Bookmark
                 </button>
                 <button
                   onClick={() => setAboutSection('upload')}
@@ -323,11 +325,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   <p className="text-center font-semibold text-white">
                     In memory of Shiekh Magdi Osman.
                   </p>
-                </div>
-                
-                <div ref={duaRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <p>
-                    May Allah accept the good deeds of all those who have passed away, and forgive the their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
+                  <p className="mt-4">
+                    May Allah accept the good deeds of all those who have passed away, and forgive them for their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
                   </p>
                 </div>
                 
@@ -405,7 +404,18 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     </form>
                   </div>
                 </div>
-                
+
+                <div ref={iosRef} className="absolute opacity-0 pointer-events-none invisible">
+                  <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
+                  <ol className="space-y-2 list-decimal list-inside">
+                    <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
+                    <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
+                    <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
+                    <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
+                  </ol>
+                  <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
+                </div>
+
                 {/* Visible content based on selected section */}
                 {aboutSection === 'mission' && (
                   <>
@@ -418,13 +428,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     <p className="text-center font-semibold text-white">
                       In memory of Shiekh Magdi Osman.
                     </p>
+                    <p className="mt-4">
+                      May Allah accept the good deeds of all those who have passed away, and forgive them for their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
+                    </p>
                   </>
-                )}
-                
-                {aboutSection === 'dua' && (
-                  <p>
-                    May Allah accept the good deeds of all those who have passed away, and forgive the their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
-                  </p>
                 )}
                 
                 {aboutSection === 'upload' && (
@@ -524,6 +531,19 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                         Send Feedback
                       </button>
                     </form>
+                  </div>
+                )}
+
+                {aboutSection === 'homescreen' && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
+                    <ol className="space-y-2 list-decimal list-inside">
+                      <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
+                      <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
+                      <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
+                      <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
+                    </ol>
+                    <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
                   </div>
                 )}
               </div>
@@ -829,42 +849,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
           currentAudioOption={currentAudioOption}
         />
         
-        {/* Listening Statistics Section */}
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
-          <h3 className="text-white font-semibold mb-4 text-center">Listening Statistics</h3>
-          <div className="space-y-4">
-            <div>
-              <p className="mb-1 text-sm text-slate-400">
-                <span className="font-semibold text-white">Your Listening Time:</span>
-              </p>
-              <p className="text-slate-300 text-lg">
-                {formatListeningTime(totalListeningTime)}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Your personal listening time (saved locally)
-              </p>
-            </div>
-            <div className="border-t border-slate-700 pt-4">
-              <p className="mb-1 text-sm text-slate-400">
-                <span className="font-semibold text-white">Global Listening Time:</span>
-              </p>
-              {globalListeningTime !== null ? (
-                <>
-                  <p className="text-slate-300 text-lg">
-                    {formatListeningTime(globalListeningTime)}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Combined listening time from all users worldwide
-                  </p>
-                </>
-              ) : (
-                <p className="text-slate-400 text-sm">
-                  Loading...
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </main>
   );
