@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getVerse } from '../data/verses';
+import { getVerse as getVerseUthmani } from '../data/verses_uthmani';
+import { getVerse as getVerseIndopak } from '../data/verses_indopak';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
@@ -22,7 +23,8 @@ function parseRange(range) {
   return verses;
 }
 
-export default function VersesDisplay({ currentSurah, currentAudioOption }) {
+export default function VersesDisplay({ currentSurah, currentAudioOption, scriptType = 'uthmani' }) {
+  const getVerse = scriptType === 'indopak' ? getVerseIndopak : getVerseUthmani;
   const [isVisible, setIsVisible] = useState(() => {
     // Load saved visibility state from localStorage, default to true
     const saved = localStorage.getItem('versesDisplayVisible');
@@ -78,8 +80,11 @@ export default function VersesDisplay({ currentSurah, currentAudioOption }) {
               </span>
             )}
           </h2>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
             Verses {currentAudioOption.range}
+            <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">
+              {scriptType === 'indopak' ? 'IndoPak' : 'Uthmani'}
+            </span>
           </p>
         </div>
         <button

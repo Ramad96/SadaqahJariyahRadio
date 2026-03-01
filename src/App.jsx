@@ -24,6 +24,9 @@ function App() {
     const saved = localStorage.getItem('totalListeningTime');
     return saved ? parseFloat(saved) : 0;
   });
+  const [scriptType, setScriptType] = useState(() =>
+    localStorage.getItem('scriptType') || 'uthmani'
+  );
   
   // Always use clips mode - keep list in order, randomly select one per surah
   const surahs = useMemo(() => {
@@ -82,6 +85,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem('totalListeningTime', totalListeningTime.toString());
   }, [totalListeningTime]);
+
+  // Save script type preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('scriptType', scriptType);
+  }, [scriptType]);
 
   // Track listening time when audio is playing
   useEffect(() => {
@@ -490,6 +498,8 @@ function App() {
         onReplayToggle={handleReplayToggle}
         currentAudioOption={currentAudioOption}
         onPlayRandom={handlePlayRandom}
+        scriptType={scriptType}
+        onScriptTypeChange={setScriptType}
       />
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">

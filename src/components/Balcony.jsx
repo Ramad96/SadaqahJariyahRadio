@@ -143,6 +143,13 @@ export default function Balcony({
                   >
                     Community
                   </button>
+                  <div className="h-px bg-slate-700" />
+                  <button
+                    onClick={() => { onMenuSelect('settings'); setShowMenu(false); }}
+                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                  >
+                    Settings
+                  </button>
                 </div>
               </>
             )}

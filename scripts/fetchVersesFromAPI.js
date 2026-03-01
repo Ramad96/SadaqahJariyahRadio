@@ -1,4 +1,4 @@
-// Script to fetch Arabic verses from Quran.com API and update verses.js
+// Script to fetch Arabic verses from Quran.com API and update verses data files
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,12 +22,12 @@ function getVerseNumbersFromRange(range) {
   if (!range) return [];
   const parts = range.split('-');
   if (parts.length !== 2) return [];
-  
+
   const start = parseInt(parts[0], 10);
   const end = parseInt(parts[1], 10);
-  
+
   if (isNaN(start) || isNaN(end) || start < 1 || end < start) return [];
-  
+
   const verses = [];
   for (let i = start; i <= end; i++) {
     verses.push(i);
@@ -39,33 +39,33 @@ function getVerseNumbersFromRange(range) {
 function extractVerseRanges() {
   const clipsPath = path.join(rootDir, 'public', 'audio_files');
   const surahVersesMap = {}; // { surahNumber: Set of verse numbers }
-  
+
   if (!fs.existsSync(clipsPath)) {
     console.log('Clips folder not found');
     return surahVersesMap;
   }
-  
+
   const surahFolders = fs.readdirSync(clipsPath)
     .filter(item => {
       const itemPath = path.join(clipsPath, item);
       return fs.statSync(itemPath).isDirectory();
     });
-  
+
   surahFolders.forEach(folder => {
     const match = folder.match(/^(\d+)-/);
     if (!match) return;
-    
+
     const surahNumber = parseInt(match[1], 10);
     const folderPath = path.join(clipsPath, folder);
     const files = fs.readdirSync(folderPath)
       .filter(file => file.endsWith('.mp3'));
-    
+
     if (files.length === 0) return;
-    
+
     if (!surahVersesMap[surahNumber]) {
       surahVersesMap[surahNumber] = new Set();
     }
-    
+
     files.forEach(file => {
       const range = parseRange(file);
       if (range) {
@@ -74,115 +74,90 @@ function extractVerseRanges() {
       }
     });
   });
-  
+
   // Convert Sets to sorted arrays
   const result = {};
   Object.keys(surahVersesMap).forEach(surahNum => {
     result[surahNum] = Array.from(surahVersesMap[surahNum]).sort((a, b) => a - b);
   });
-  
+
   return result;
 }
 
-// Fetch all verses for a chapter from Quran.com API
-async function fetchVersesForChapter(surahNumber) {
+// Fetch all verses for a chapter from Quran.com API by script type
+async function fetchVersesForChapterByScript(surahNumber, script) {
+  const scriptConfig = {
+    uthmani: { endpoint: 'uthmani', field: 'text_uthmani' },
+    indopak: { endpoint: 'indopak', field: 'text_indopak' },
+  };
+
+  const { endpoint, field } = scriptConfig[script];
+
   try {
-    // Use the quran/verses/uthmani endpoint which returns text_uthmani
-    const url = `https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=${surahNumber}`;
-    
+    const url = `https://api.quran.com/api/v4/quran/verses/${endpoint}?chapter_number=${surahNumber}`;
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
-    // Build a map of verse_number -> text_uthmani
-    // The verse_key is in format "chapter:verse" (e.g., "1:1")
+
     const versesMap = {};
     if (data.verses && Array.isArray(data.verses)) {
       data.verses.forEach(verse => {
-        if (verse.verse_key && verse.text_uthmani) {
-          // Extract verse number from verse_key (format: "1:1" -> verse 1)
+        if (verse.verse_key && verse[field]) {
           const verseNumber = parseInt(verse.verse_key.split(':')[1], 10);
           if (!isNaN(verseNumber) && verseNumber > 0) {
-            versesMap[verseNumber] = verse.text_uthmani;
+            versesMap[verseNumber] = verse[field];
           }
         }
       });
     }
-    
+
     return versesMap;
   } catch (error) {
-    console.error(`Error fetching verses for chapter ${surahNumber}:`, error.message);
+    console.error(`Error fetching ${script} verses for chapter ${surahNumber}:`, error.message);
     return {};
   }
 }
 
-// Fetch all verses for a surah
-async function fetchVersesForSurah(surahNumber, verseNumbers) {
-  console.log(`Fetching verses for Surah ${surahNumber}...`);
-  
-  // Fetch all verses for the chapter at once
-  const allVerses = await fetchVersesForChapter(surahNumber);
-  
-  // Extract only the verses we need
+// Fetch needed verses for a surah by script type
+async function fetchVersesForSurah(surahNumber, verseNumbers, script) {
+  const allVerses = await fetchVersesForChapterByScript(surahNumber, script);
+
   const verses = {};
   for (const verseNum of verseNumbers) {
     if (allVerses[verseNum]) {
       verses[verseNum] = allVerses[verseNum];
-      console.log(`  ✓ Verse ${verseNum}`);
+      console.log(`  ✓ [${script}] Verse ${verseNum}`);
     } else {
-      console.log(`  ✗ Verse ${verseNum} - not found in API response`);
-      verses[verseNum] = ""; // Keep placeholder
+      console.log(`  ✗ [${script}] Verse ${verseNum} - not found in API response`);
+      verses[verseNum] = "";
     }
   }
-  
+
   // Add a small delay to avoid rate limiting
   await new Promise(resolve => setTimeout(resolve, 500));
-  
+
   return verses;
 }
 
-// Main function
-async function rebuildVerses() {
-  console.log('Extracting verse ranges from audio files...\n');
-  const verseRanges = extractVerseRanges();
-  
-  console.log('Found verses needed:');
-  Object.keys(verseRanges).forEach(surahNum => {
-    const verses = verseRanges[surahNum];
-    const min = Math.min(...verses);
-    const max = Math.max(...verses);
-    console.log(`  Surah ${surahNum}: verses ${min}-${max} (${verses.length} verses)`);
-  });
-  
-  console.log('\nFetching Arabic text from Quran.com API...\n');
-  
-  const allVerses = {};
-  
-  // Sort surah numbers
-  const surahNumbers = Object.keys(verseRanges).map(Number).sort((a, b) => a - b);
-  
-  for (const surahNum of surahNumbers) {
-    const verseNumbers = verseRanges[surahNum];
-    if (verseNumbers.length === 0) continue;
-    
-    const verses = await fetchVersesForSurah(surahNum, verseNumbers);
-    allVerses[surahNum] = verses;
-    console.log(`\nCompleted Surah ${surahNum}\n`);
-  }
-  
-  // Generate the verses.js file
-  let versesContent = `// Arabic verses of the Quran
-// Generated based on audio files in public/audio_files/clips folder
+// Generate JS file content for a given script's verse data
+function generateVersesFileContent(allVerses, surahNumbers, script) {
+  const scriptLabels = {
+    uthmani: 'Uthmani (Madani)',
+    indopak: 'IndoPak',
+  };
+  const apiEndpoint = `https://api.quran.com/api/v4/quran/verses/${script}`;
+
+  let content = `// Arabic verses of the Quran — ${scriptLabels[script]} script
+// Generated based on audio files in public/audio_files/ folder
 // Only includes verses that have corresponding audio files
 // Generated by scripts/fetchVersesFromAPI.js
-// 
-// SOURCE: Arabic text fetched from Quran.com API (Uthmani script)
-// API: https://api.quran.com/api/v4/quran/verses/uthmani
-// 
-// Note: All verses with corresponding audio files now have Arabic text.
+//
+// SOURCE: Arabic text fetched from Quran.com API (${scriptLabels[script]} script)
+// API: ${apiEndpoint}
 
 export const verses = {
 `;
@@ -190,36 +165,24 @@ export const verses = {
   surahNumbers.forEach(surahNum => {
     const verses = allVerses[surahNum];
     if (!verses || Object.keys(verses).length === 0) return;
-    
+
     const verseNumbers = Object.keys(verses).map(Number).sort((a, b) => a - b);
-    versesContent += `  ${surahNum}: {\n`;
-    versesContent += `    // Verses needed: ${verseNumbers.join(', ')}\n`;
+    content += `  ${surahNum}: {\n`;
+    content += `    // Verses needed: ${verseNumbers.join(', ')}\n`;
     verseNumbers.forEach(verseNum => {
       const text = verses[verseNum] || "";
-      // Escape quotes in the Arabic text
       const escapedText = text.replace(/"/g, '\\"');
-      versesContent += `    ${verseNum}: "${escapedText}",\n`;
+      content += `    ${verseNum}: "${escapedText}",\n`;
     });
-    versesContent += `  },\n`;
+    content += `  },\n`;
   });
-  
-  versesContent += `};
 
-/**
- * Get verses for a specific surah
- * @param {number} surahNumber - The surah number (1-114)
- * @returns {Object|null} - Object with verse numbers as keys and Arabic text as values, or null if not found
- */
+  content += `};
+
 export function getVersesForSurah(surahNumber) {
   return verses[surahNumber] || null;
 }
 
-/**
- * Get a specific verse
- * @param {number} surahNumber - The surah number (1-114)
- * @param {number} verseNumber - The verse number (1-based)
- * @returns {string|null} - The Arabic verse text, or null if not found
- */
 export function getVerse(surahNumber, verseNumber) {
   const surahVerses = verses[surahNumber];
   if (!surahVerses || !surahVerses[verseNumber]) {
@@ -228,11 +191,6 @@ export function getVerse(surahNumber, verseNumber) {
   return surahVerses[verseNumber];
 }
 
-/**
- * Get all verse numbers available for a surah
- * @param {number} surahNumber - The surah number (1-114)
- * @returns {number[]} - Array of verse numbers that have Arabic text
- */
 export function getAvailableVerseNumbers(surahNumber) {
   const surahVerses = verses[surahNumber];
   if (!surahVerses) return [];
@@ -240,11 +198,46 @@ export function getAvailableVerseNumbers(surahNumber) {
 }
 `;
 
-  const versesPath = path.join(rootDir, 'src', 'data', 'verses.js');
-  fs.writeFileSync(versesPath, versesContent);
-  
-  console.log(`\n✅ Verses file updated at: ${versesPath}`);
-  console.log('All verses have been fetched from Quran.com API');
+  return content;
+}
+
+// Main function
+async function rebuildVerses() {
+  console.log('Extracting verse ranges from audio files...\n');
+  const verseRanges = extractVerseRanges();
+
+  console.log('Found verses needed:');
+  Object.keys(verseRanges).forEach(surahNum => {
+    const verses = verseRanges[surahNum];
+    const min = Math.min(...verses);
+    const max = Math.max(...verses);
+    console.log(`  Surah ${surahNum}: verses ${min}-${max} (${verses.length} verses)`);
+  });
+
+  const surahNumbers = Object.keys(verseRanges).map(Number).sort((a, b) => a - b);
+  const scripts = ['uthmani', 'indopak'];
+
+  for (const script of scripts) {
+    console.log(`\nFetching ${script} Arabic text from Quran.com API...\n`);
+
+    const allVerses = {};
+
+    for (const surahNum of surahNumbers) {
+      const verseNumbers = verseRanges[surahNum];
+      if (verseNumbers.length === 0) continue;
+
+      console.log(`Fetching verses for Surah ${surahNum} [${script}]...`);
+      allVerses[surahNum] = await fetchVersesForSurah(surahNum, verseNumbers, script);
+      console.log(`Completed Surah ${surahNum} [${script}]\n`);
+    }
+
+    const filename = `verses_${script}.js`;
+    const filePath = path.join(rootDir, 'src', 'data', filename);
+    fs.writeFileSync(filePath, generateVersesFileContent(allVerses, surahNumbers, script));
+    console.log(`✅ ${filename} written to: ${filePath}`);
+  }
+
+  console.log('\n✅ All verse files generated successfully.');
 }
 
 // Run the script
@@ -252,4 +245,3 @@ rebuildVerses().catch(error => {
   console.error('Error rebuilding verses:', error);
   process.exit(1);
 });
-

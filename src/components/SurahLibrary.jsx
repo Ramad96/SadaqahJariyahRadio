@@ -30,7 +30,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom, scriptType, onScriptTypeChange }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -537,7 +537,55 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
             </div>
           </div>
         )}
-        
+
+        {/* Settings Modal */}
+        {menuSection === 'settings' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-center relative mb-6">
+                <h2 className="text-xl font-bold text-white">Settings</h2>
+                <button
+                  onClick={onCloseMenu}
+                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Quran Script</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => onScriptTypeChange('uthmani')}
+                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
+                        scriptType === 'uthmani'
+                          ? 'bg-indigo-600 border-indigo-500 text-white'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                    >
+                      <div className="font-semibold">Uthmani</div>
+                      <div className="text-xs opacity-70 mt-0.5">Madani Mushaf</div>
+                    </button>
+                    <button
+                      onClick={() => onScriptTypeChange('indopak')}
+                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
+                        scriptType === 'indopak'
+                          ? 'bg-indigo-600 border-indigo-500 text-white'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                    >
+                      <div className="font-semibold">IndoPak</div>
+                      <div className="text-xs opacity-70 mt-0.5">Nastaleeq Style</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
           <div className="mb-4">
             <button
@@ -834,6 +882,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         <VersesDisplay
           currentSurah={currentSurah}
           currentAudioOption={currentAudioOption}
+          scriptType={scriptType}
         />
         
       </div>
