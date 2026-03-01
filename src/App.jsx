@@ -12,7 +12,7 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
+  const [menuSection, setMenuSection] = useState(null);
   const [isReplayEnabled, setIsReplayEnabled] = useState(false);
   const [selectedAudio, setSelectedAudio] = useState(() => {
     // Load from localStorage or default to "Default" for all surahs
@@ -467,7 +467,7 @@ function App() {
         progress={progress}
         duration={duration}
         version={VERSION}
-        onShowAbout={() => setShowAbout(true)}
+        onMenuSelect={setMenuSection}
         isReplayEnabled={isReplayEnabled}
         onReplayToggle={handleReplayToggle}
       />
@@ -480,8 +480,8 @@ function App() {
         onAutoPlayNextChange={setAutoPlayNext}
         isPlaying={isPlaying}
         onPlayPause={handlePlayPause}
-        showAbout={showAbout}
-        onCloseAbout={() => setShowAbout(false)}
+        menuSection={menuSection}
+        onCloseMenu={() => setMenuSection(null)}
         selectedAudio={selectedAudio}
         onAudioSelect={handleAudioSelect}
         getSurahAudioUrl={getSurahAudioUrl}

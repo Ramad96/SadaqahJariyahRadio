@@ -30,42 +30,36 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, showAbout, onCloseAbout, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
-  const [aboutSection, setAboutSection] = useState('mission');
+  const [aboutTab, setAboutTab] = useState('mission');
+  const [communitySection, setCommunitySection] = useState('upload');
   const [contentHeight, setContentHeight] = useState(0);
   const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
   const [showHelp, setShowHelp] = useState(false);
-  const [globalListeningTime, setGlobalListeningTime] = useState(null); // null = loading, number = seconds
+  const [globalListeningTime, setGlobalListeningTime] = useState(undefined); // undefined = loading, null = unavailable, number = seconds
   const [feedbackForm, setFeedbackForm] = useState({ subject: '', message: '' });
   const [selectedReciterFilter, setSelectedReciterFilter] = useState('all'); // 'all' or reciter name
   const [showReciterFilter, setShowReciterFilter] = useState(false);
-  const missionRef = useRef(null);
-  const duaRef = useRef(null);
   const uploadRef = useRef(null);
   const statsRef = useRef(null);
   const feedbackRef = useRef(null);
-  const iosRef = useRef(null);
   const contentContainerRef = useRef(null);
-  
-  // Calculate the maximum height of all content sections
+
+  // Calculate the maximum height of community section tabs
   useEffect(() => {
-    if (showAbout && contentContainerRef.current) {
-      // Temporarily show all sections to measure them
-      const missionHeight = missionRef.current?.scrollHeight || 0;
-      const duaHeight = duaRef.current?.scrollHeight || 0;
+    if (menuSection === 'community' && contentContainerRef.current) {
       const uploadHeight = uploadRef.current?.scrollHeight || 0;
       const statsHeight = statsRef.current?.scrollHeight || 0;
       const feedbackHeight = feedbackRef.current?.scrollHeight || 0;
-      const iosHeight = iosRef.current?.scrollHeight || 0;
-      const maxHeight = Math.max(missionHeight, duaHeight, uploadHeight, statsHeight, feedbackHeight, iosHeight);
+      const maxHeight = Math.max(uploadHeight, statsHeight, feedbackHeight);
       if (maxHeight > 0) {
         setContentHeight(maxHeight);
       }
     }
-  }, [showAbout, totalListeningTime, feedbackForm]);
+  }, [menuSection, totalListeningTime, feedbackForm]);
 
   // Fetch global listening stats on component mount and periodically
   useEffect(() => {
@@ -240,26 +234,25 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
         )}
         
         {/* About Us Modal */}
-        {showAbout && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseAbout}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+        {menuSection === 'about' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
                 <h2 className="text-xl font-bold text-white">About Us</h2>
                 <button
-                  onClick={onCloseAbout}
+                  onClick={onCloseMenu}
                   className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
                   aria-label="Close"
                 >
                   <X size={20} />
                 </button>
               </div>
-              
-              {/* Clickable Sections */}
+              {/* Tabs */}
               <div className="flex gap-2 mb-4 border-b border-slate-700 flex-shrink-0">
                 <button
-                  onClick={() => setAboutSection('mission')}
+                  onClick={() => setAboutTab('mission')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'mission'
+                    aboutTab === 'mission'
                       ? 'text-white border-b-2 border-indigo-500'
                       : 'text-slate-400 hover:text-slate-300'
                   }`}
@@ -267,157 +260,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                   Mission
                 </button>
                 <button
-                  onClick={() => setAboutSection('homescreen')}
+                  onClick={() => setAboutTab('dua')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'homescreen'
+                    aboutTab === 'dua'
                       ? 'text-white border-b-2 border-indigo-500'
                       : 'text-slate-400 hover:text-slate-300'
                   }`}
                 >
-                  Bookmark
+                  Dua
                 </button>
                 <button
-                  onClick={() => setAboutSection('upload')}
+                  onClick={() => setAboutTab('amanahdigital')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'upload'
+                    aboutTab === 'amanahdigital'
                       ? 'text-white border-b-2 border-indigo-500'
                       : 'text-slate-400 hover:text-slate-300'
                   }`}
                 >
-                  Upload
-                </button>
-                <button
-                  onClick={() => setAboutSection('stats')}
-                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'stats'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
-                  }`}
-                >
-                  Stats
-                </button>
-                <button
-                  onClick={() => setAboutSection('feedback')}
-                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    aboutSection === 'feedback'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
-                  }`}
-                >
-                  Feedback
+                  AmanahDigital1447
                 </button>
               </div>
-              
-              {/* Section Content */}
-              <div 
-                ref={contentContainerRef}
-                className="text-slate-300 text-sm leading-relaxed space-y-3 overflow-y-auto relative"
-                style={{ minHeight: contentHeight > 0 ? `${contentHeight}px` : 'auto' }}
-              >
-                {/* Hidden sections for measurement */}
-                <div ref={missionRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <p>
-                    The purpose of this website is to listen to Quran recitation of those who have returned to our Creator, and insha'allah this will be sadaqah jariya for them. May Allah accept their ibadah.
-                  </p>
-                  <p className="text-center font-semibold text-white mt-4">
-                    May Allah accept this as reward for my parents.
-                  </p>
-                  <p className="text-center font-semibold text-white">
-                    In memory of Shiekh Magdi Osman.
-                  </p>
-                  <p className="mt-4">
-                    May Allah accept the good deeds of all those who have passed away, and forgive them for their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
-                  </p>
-                </div>
-                
-                <div ref={uploadRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <p>
-                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
-                  </p>
-                </div>
-                
-                <div ref={statsRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <div>
-                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="mb-1">
-                          <span className="font-semibold text-white">Your Listening Time:</span>
-                        </p>
-                        <p className="text-slate-300">
-                          {formatListeningTime(totalListeningTime)}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Your personal listening time (saved locally)
-                        </p>
-                      </div>
-                      <div className="border-t border-slate-700 pt-3">
-                        <p className="mb-1">
-                          <span className="font-semibold text-white">Global Listening Time:</span>
-                        </p>
-                        <p className="text-slate-300">
-                          {formatListeningTime(0)}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Combined listening time from all users worldwide
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div ref={feedbackRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <div>
-                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
-                    <p className="mb-4 text-slate-300">
-                      If you encounter any issues with the website or have feedback, please fill out the form below. This will open your email client to send a message to us.
-                    </p>
-                    <form className="space-y-4">
-                      <div>
-                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">
-                          Subject
-                        </label>
-                        <input
-                          type="text"
-                          id="feedback-subject"
-                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                          placeholder="Brief description of the issue"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">
-                          Message
-                        </label>
-                        <textarea
-                          id="feedback-message"
-                          rows={5}
-                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                          placeholder="Please describe the issue or provide your feedback..."
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all"
-                      >
-                        Send Feedback
-                      </button>
-                    </form>
-                  </div>
-                </div>
 
-                <div ref={iosRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
-                  <ol className="space-y-2 list-decimal list-inside">
-                    <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
-                    <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
-                    <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
-                    <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
-                  </ol>
-                  <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
-                </div>
-
-                {/* Visible content based on selected section */}
-                {aboutSection === 'mission' && (
+              <div className="text-slate-300 text-sm leading-relaxed space-y-3 overflow-y-auto text-center">
+                {aboutTab === 'mission' && (
                   <>
                     <p>
                       The purpose of this website is to listen to Quran recitation of those who have returned to our Creator, and insha'allah this will be sadaqah jariya for them. May Allah accept their ibadah.
@@ -428,63 +293,202 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                     <p className="text-center font-semibold text-white">
                       In memory of Shiekh Magdi Osman.
                     </p>
-                    <p className="mt-4">
-                      May Allah accept the good deeds of all those who have passed away, and forgive them for their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
-                    </p>
                   </>
                 )}
-                
-                {aboutSection === 'upload' && (
+                {aboutTab === 'dua' && (
+                  <p>
+                    May Allah accept the good deeds of all those who have passed away, and forgive them for their shortcomings. May Allah bless all those who listen to the recitation on this website and bless the reciters with hasant. Ameen
+                  </p>
+                )}
+                {aboutTab === 'amanahdigital' && (
+                  <div className="space-y-3">
+                    <p>
+                      AmanahDigital creates innovative services and tools designed to strengthen the Ummah's iman and spiritual growth.
+                    </p>
+                    <p>
+                      We make it easier to engage in deen-related activities through simple, accessible, and impactful digital solutions.
+                    </p>
+                    <a
+                      href="https://amanahdigital.co.uk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-1 text-indigo-400 hover:text-indigo-300 underline transition-colors"
+                    >
+                      amanahdigital.co.uk
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bookmark Modal */}
+        {menuSection === 'bookmark' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
+                <h2 className="text-xl font-bold text-white">Bookmark</h2>
+                <button
+                  onClick={onCloseMenu}
+                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="text-slate-300 text-sm leading-relaxed text-center">
+                <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
+                <ol className="space-y-2 list-decimal list-inside">
+                  <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
+                  <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
+                  <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
+                  <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
+                </ol>
+                <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Community Modal */}
+        {menuSection === 'community' && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
+            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
+                <h2 className="text-xl font-bold text-white">Community</h2>
+                <button
+                  onClick={onCloseMenu}
+                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  aria-label="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex gap-2 mb-4 border-b border-slate-700 flex-shrink-0">
+                <button
+                  onClick={() => setCommunitySection('upload')}
+                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
+                    communitySection === 'upload'
+                      ? 'text-white border-b-2 border-indigo-500'
+                      : 'text-slate-400 hover:text-slate-300'
+                  }`}
+                >
+                  Upload
+                </button>
+                <button
+                  onClick={() => setCommunitySection('stats')}
+                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
+                    communitySection === 'stats'
+                      ? 'text-white border-b-2 border-indigo-500'
+                      : 'text-slate-400 hover:text-slate-300'
+                  }`}
+                >
+                  Stats
+                </button>
+                <button
+                  onClick={() => setCommunitySection('feedback')}
+                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
+                    communitySection === 'feedback'
+                      ? 'text-white border-b-2 border-indigo-500'
+                      : 'text-slate-400 hover:text-slate-300'
+                  }`}
+                >
+                  Feedback
+                </button>
+              </div>
+
+              {/* Content */}
+              <div
+                ref={contentContainerRef}
+                className="text-slate-300 text-sm leading-relaxed space-y-3 overflow-y-auto relative text-center"
+                style={{ minHeight: contentHeight > 0 ? `${contentHeight}px` : 'auto' }}
+              >
+                {/* Hidden sections for measurement */}
+                <div ref={uploadRef} className="absolute opacity-0 pointer-events-none invisible">
                   <p>
                     If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
                   </p>
-                )}
-                
-                {aboutSection === 'stats' && (
+                </div>
+
+                <div ref={statsRef} className="absolute opacity-0 pointer-events-none invisible">
                   <div>
                     <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="mb-1">
-                          <span className="font-semibold text-white">Your Listening Time:</span>
-                        </p>
-                        <p className="text-slate-300">
-                          {formatListeningTime(totalListeningTime)}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Your personal listening time (saved locally)
-                        </p>
+                        <p className="mb-1"><span className="font-semibold text-white">Your Listening Time:</span></p>
+                        <p className="text-slate-300">{formatListeningTime(totalListeningTime)}</p>
+                        <p className="text-xs text-slate-400 mt-1">Your personal listening time (saved locally)</p>
                       </div>
                       <div className="border-t border-slate-700 pt-3">
-                        <p className="mb-1">
-                          <span className="font-semibold text-white">Global Listening Time:</span>
-                        </p>
-                        {globalListeningTime !== null ? (
-                          <>
-                            <p className="text-slate-300">
-                              {formatListeningTime(globalListeningTime)}
-                            </p>
-                            <p className="text-xs text-slate-400 mt-1">
-                              Combined listening time from all users worldwide
-                            </p>
-                          </>
+                        <p className="mb-1"><span className="font-semibold text-white">Global Listening Time:</span></p>
+                        <p className="text-slate-300">{formatListeningTime(0)}</p>
+                        <p className="text-xs text-slate-400 mt-1">Combined listening time from all users worldwide</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div ref={feedbackRef} className="absolute opacity-0 pointer-events-none invisible">
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
+                    <p className="mb-4 text-slate-300">If you encounter any issues with the website or have feedback, please fill out the form below.</p>
+                    <form className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Subject</label>
+                        <input type="text" className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500" placeholder="Brief description of the issue" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Message</label>
+                        <textarea rows={5} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none" placeholder="Please describe the issue..." />
+                      </div>
+                      <button type="submit" className="w-full px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg">Send Feedback</button>
+                    </form>
+                  </div>
+                </div>
+
+                {/* Visible content */}
+                {communitySection === 'upload' && (
+                  <p>
+                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
+                  </p>
+                )}
+
+                {communitySection === 'stats' && (
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="mb-1"><span className="font-semibold text-white">Your Listening Time:</span></p>
+                        <p className="text-slate-300">{formatListeningTime(totalListeningTime)}</p>
+                        <p className="text-xs text-slate-400 mt-1">Your personal listening time (saved locally)</p>
+                      </div>
+                      <div className="border-t border-slate-700 pt-3">
+                        <p className="mb-1"><span className="font-semibold text-white">Global Listening Time:</span></p>
+                        {globalListeningTime === undefined ? (
+                          <p className="text-slate-400 text-sm">Loading...</p>
+                        ) : globalListeningTime === null ? (
+                          <p className="text-slate-400 text-sm">Not available</p>
                         ) : (
-                          <p className="text-slate-400 text-sm">
-                            Loading...
-                          </p>
+                          <>
+                            <p className="text-slate-300">{formatListeningTime(globalListeningTime)}</p>
+                            <p className="text-xs text-slate-400 mt-1">Combined listening time from all users worldwide</p>
+                          </>
                         )}
                       </div>
                     </div>
                   </div>
                 )}
-                
-                {aboutSection === 'feedback' && (
+
+                {communitySection === 'feedback' && (
                   <div>
                     <h3 className="text-white font-semibold mb-3">Feedback</h3>
                     <p className="mb-4 text-slate-300">
                       If you encounter any issues with the website or have feedback, please fill out the form below. This will open your email client to send a message to us.
                     </p>
-                    <form 
+                    <form
                       onSubmit={(e) => {
                         e.preventDefault();
                         const subject = encodeURIComponent(feedbackForm.subject || 'Website Feedback');
@@ -498,9 +502,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                       className="space-y-4"
                     >
                       <div>
-                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">
-                          Subject
-                        </label>
+                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">Subject</label>
                         <input
                           type="text"
                           id="feedback-subject"
@@ -511,9 +513,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                         />
                       </div>
                       <div>
-                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">
-                          Message
-                        </label>
+                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">Message</label>
                         <textarea
                           id="feedback-message"
                           rows={5}
@@ -531,19 +531,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
                         Send Feedback
                       </button>
                     </form>
-                  </div>
-                )}
-
-                {aboutSection === 'homescreen' && (
-                  <div>
-                    <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
-                    <ol className="space-y-2 list-decimal list-inside">
-                      <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
-                      <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
-                      <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
-                      <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
-                    </ol>
-                    <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
                   </div>
                 )}
               </div>

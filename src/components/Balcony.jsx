@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Radio, Repeat } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Radio, Repeat, Menu } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 
 export default function Balcony({ 
@@ -12,13 +12,14 @@ export default function Balcony({
   progress, 
   duration,
   version,
-  onShowAbout,
+  onMenuSelect,
   isReplayEnabled,
   onReplayToggle
 }) {
   const textRef = useRef(null);
   const containerRef = useRef(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   // Build the display text with surah name, reciter, and ayah range
   const baseText = currentSurah ? (() => {
@@ -109,15 +110,42 @@ export default function Balcony({
             </button>
           </div>
 
-          {/* Right: About Us */}
-          <div className="flex-shrink-0">
+          {/* Right: Hamburger Menu */}
+          <div className="flex-shrink-0 relative">
             <button
-              onClick={onShowAbout}
-              className="text-white font-bold text-base hover:text-white/80 transition-all"
-              aria-label="About Us"
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all"
+              aria-label="Menu"
             >
-              About Us
+              <Menu size={20} />
             </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+                <div className="absolute right-0 top-full mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden min-w-[150px]">
+                  <button
+                    onClick={() => { onMenuSelect('about'); setShowMenu(false); }}
+                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                  >
+                    About Us
+                  </button>
+                  <div className="h-px bg-slate-700" />
+                  <button
+                    onClick={() => { onMenuSelect('bookmark'); setShowMenu(false); }}
+                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                  >
+                    Bookmark
+                  </button>
+                  <div className="h-px bg-slate-700" />
+                  <button
+                    onClick={() => { onMenuSelect('community'); setShowMenu(false); }}
+                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                  >
+                    Community
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
