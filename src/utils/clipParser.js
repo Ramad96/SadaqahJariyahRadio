@@ -37,7 +37,7 @@ export function parseClipFilename(filename) {
  */
 export async function loadClipsForSurah(surahNumber, surahFolderName) {
   const baseUrl = import.meta.env.BASE_URL;
-  const clipsPath = `${baseUrl}audio_files/clips/${surahFolderName}/`;
+  const clipsPath = `${baseUrl}audio_files/${surahFolderName}/`;
   
   // In a real application, you'd fetch the list of files from the server
   // For now, we'll use a predefined list or check common filenames
@@ -56,7 +56,7 @@ export function createClipAudioOption(filename, surahFolderName) {
   if (!parsed) return null;
   
   const baseUrl = import.meta.env.BASE_URL;
-  const url = `${baseUrl}audio_files/clips/${surahFolderName}/${filename}`;
+  const url = `${baseUrl}audio_files/${surahFolderName}/${filename}`;
   
   return {
     name: parsed.displayName,

@@ -253,7 +253,7 @@ export function getClipsForSurah(surahNumber, surahFolderName) {
       name: parsed.displayName,
       reciter: parsed.reciter,
       range: parsed.range,
-      url: `${baseUrl}audio_files/clips/${surahFolderName}/${clip.filename}`,
+      url: `${baseUrl}audio_files/${surahFolderName}/${clip.filename}`,
       isClip: true
     };
   }).filter(Boolean);

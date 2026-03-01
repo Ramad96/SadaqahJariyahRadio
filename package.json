@@ -1,10 +1,11 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.21.9",
+  "version": "2.22.0",
   "type": "module",
   "scripts": {
     "dev": "npm run generate-manifest && npm run fetch-verses && vite",
+    "dev:quick": "vite",
     "build": "npm run generate-manifest && npm run fetch-verses && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

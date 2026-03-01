@@ -37,7 +37,7 @@ function getVerseNumbersFromRange(range) {
 
 // Extract verse ranges from clips folder
 function extractVerseRanges() {
-  const clipsPath = path.join(rootDir, 'public', 'audio_files', 'clips');
+  const clipsPath = path.join(rootDir, 'public', 'audio_files');
   const surahVersesMap = {}; // { surahNumber: Set of verse numbers }
   
   if (!fs.existsSync(clipsPath)) {

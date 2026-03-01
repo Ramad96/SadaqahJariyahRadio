@@ -65,7 +65,7 @@ function scanSurahFolder(surahNumber, surahName) {
 // Scan clips folder
 function scanClipsFolder(surahNumber, surahName) {
   const folderName = `${surahNumber}-${surahName}`;
-  const folderPath = path.join(rootDir, 'public', 'audio_files', 'clips', folderName);
+  const folderPath = path.join(rootDir, 'public', 'audio_files', folderName);
   
   if (!fs.existsSync(folderPath)) {
     return [];
@@ -178,7 +178,7 @@ export function getClipsForSurah(surahNumber, surahFolderName) {
       name: parsed.displayName,
       reciter: parsed.reciter,
       range: parsed.range,
-      url: \`\${baseUrl}audio_files/clips/\${surahFolderName}/\${clip.filename}\`,
+      url: \`\${baseUrl}audio_files/\${surahFolderName}/\${clip.filename}\`,
       isClip: true
     };
   }).filter(Boolean);

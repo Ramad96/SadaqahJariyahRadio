@@ -4,8 +4,7 @@ import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/clipsManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
-
-const VERSION = '2.21.7';
+import { version as VERSION } from '../package.json';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);

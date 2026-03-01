@@ -3,13 +3,4 @@
 // Do not edit manually - run 'npm run generate-manifest' to update
 
 export const surahManifest = {
-  1: [
-      {
-          "filename": "SheikhFouadSaeedAbdulkadir_1-7.mp3",
-          "reciter": "Sheikh Fouad Saeed Abdulkadir",
-          "range": "1-7",
-          "displayName": "Sheikh Fouad Saeed Abdulkadir (1-7)",
-          "isClip": false
-      }
-  ],
 };
