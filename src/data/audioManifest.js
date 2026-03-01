@@ -4,7 +4,7 @@
 
 import { parseClipFilename } from '../utils/clipParser';
 
-export const clipsManifest = {
+export const audioManifest = {
   1: [
       {
           "filename": "AbdullahAhmed_1-7.mp3"
@@ -26,6 +26,9 @@ export const clipsManifest = {
       }
   ],
   2: [
+      {
+          "filename": "AbdulazizAlGhuwairi_285-286.mp3"
+      },
       {
           "filename": "AbdullahAhmed_182-182.mp3"
       },
@@ -243,12 +246,12 @@ export const clipsManifest = {
  */
 export function getClipsForSurah(surahNumber, surahFolderName) {
   const baseUrl = import.meta.env.BASE_URL;
-  const clips = clipsManifest[surahNumber] || [];
-  
+  const clips = audioManifest[surahNumber] || [];
+
   return clips.map(clip => {
     const parsed = parseClipFilename(clip.filename);
     if (!parsed) return null;
-    
+
     return {
       name: parsed.displayName,
       reciter: parsed.reciter,

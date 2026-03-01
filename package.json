@@ -1,16 +1,18 @@
 {
   "name": "quranradio",
   "private": true,
-  "version": "2.23.0",
+  "version": "2.24.1",
   "type": "module",
   "scripts": {
-    "dev": "npm run generate-manifest && npm run fetch-verses && vite",
+    "dev": "npm run setup && vite",
     "dev:quick": "vite",
-    "build": "npm run generate-manifest && npm run fetch-verses && vite build",
+    "build": "npm run setup && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "setup": "node scripts/setup.js",
     "generate-manifest": "node scripts/generateAudioManifest.js",
     "generate-verses": "node scripts/generateVersesData.js",
+    "check-verses": "node scripts/checkVerses.js",
     "fetch-verses": "node scripts/fetchVersesFromAPI.js"
   },
   "dependencies": {

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
 import { surahs as baseSurahs } from './data/surahs';
-import { getClipsForSurah } from './data/clipsManifest';
+import { getClipsForSurah } from './data/audioManifest';
 import { incrementGlobalListeningTime } from './utils/supabase';
 import { version as VERSION } from '../package.json';
 
