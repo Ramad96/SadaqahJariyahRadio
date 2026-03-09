@@ -30,7 +30,7 @@ function formatListeningTime(seconds) {
   return parts.join(', ') || '0 seconds';
 }
 
-export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom, scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange }) {
+export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFilteredSurahsChange, autoPlayNext, onAutoPlayNextChange, isPlaying, onPlayPause, menuSection, onCloseMenu, selectedAudio, onAudioSelect, getSurahAudioUrl, totalListeningTime, isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom, scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
   const [expandedSurah, setExpandedSurah] = useState(null);
@@ -146,6 +146,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, auto
       );
     });
   }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
+
+  // Notify parent whenever the filtered list changes so auto-play can use it
+  useEffect(() => {
+    onFilteredSurahsChange(filteredSurahs);
+  }, [filteredSurahs, onFilteredSurahsChange]);
 
   return (
     <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">

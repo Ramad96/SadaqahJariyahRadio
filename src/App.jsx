@@ -78,9 +78,12 @@ function App() {
   const listeningTimeIntervalRef = useRef(null);
   const lastUpdateTimeRef = useRef(null);
   const accumulatedGlobalTimeRef = useRef(0); // Accumulate before sending to Supabase
+  const selectedAudioRef = useRef(selectedAudio);
+  const filteredSurahsRef = useRef([]);
   
-  // Save selected audio to localStorage whenever it changes
+  // Keep refs in sync with state
   useEffect(() => {
+    selectedAudioRef.current = selectedAudio;
     localStorage.setItem('selectedAudio', JSON.stringify(selectedAudio));
   }, [selectedAudio]);
 
@@ -238,16 +241,42 @@ function App() {
           setProgress(0);
           // Only auto-play next if the option is enabled
           if (autoPlayNextRef.current && currentSurahRef.current) {
-            const currentIndex = surahs.findIndex(s => s.id === currentSurahRef.current.id);
-            // Find next surah with audio
-            let nextIndex = (currentIndex + 1) % surahs.length;
+            const currentSurahId = currentSurahRef.current.id;
+            const filtered = filteredSurahsRef.current;
+            const currentSurahData = filtered.find(s => s.id === currentSurahId);
+
+            // Try to play the next clip within the same surah first
+            if (currentSurahData && currentSurahData.audioOptions && currentSurahData.audioOptions.length > 1) {
+              const clips = currentSurahData.audioOptions;
+              const currentClipName = selectedAudioRef.current[currentSurahId];
+              const currentClipIndex = clips.findIndex(c => c.name === currentClipName);
+              if (currentClipIndex >= 0 && currentClipIndex < clips.length - 1) {
+                // Play next clip in the same surah
+                const nextClip = clips[currentClipIndex + 1];
+                setSelectedAudio(prev => ({ ...prev, [currentSurahId]: nextClip.name }));
+                return;
+              }
+            }
+
+            // All clips in this surah are done — move to the next surah in the filtered list
+            const currentIndex = filtered.findIndex(s => s.id === currentSurahId);
+            const listToSearch = currentIndex >= 0 ? filtered : surahs;
+            const baseIndex = currentIndex >= 0 ? currentIndex : surahs.findIndex(s => s.id === currentSurahId);
+            let nextIndex = (baseIndex + 1) % listToSearch.length;
             let attempts = 0;
-            while (!surahs[nextIndex].audioUrl && attempts < surahs.length) {
-              nextIndex = (nextIndex + 1) % surahs.length;
+            while (!listToSearch[nextIndex].audioUrl && attempts < listToSearch.length) {
+              nextIndex = (nextIndex + 1) % listToSearch.length;
               attempts++;
             }
-            if (surahs[nextIndex].audioUrl) {
-              setCurrentSurah(surahs[nextIndex]);
+            if (listToSearch[nextIndex].audioUrl) {
+              const nextSurahFiltered = listToSearch[nextIndex];
+              // Reset to the first clip of the next surah
+              if (nextSurahFiltered.audioOptions && nextSurahFiltered.audioOptions.length > 0) {
+                setSelectedAudio(prev => ({ ...prev, [nextSurahFiltered.id]: nextSurahFiltered.audioOptions[0].name }));
+              }
+              // Set currentSurah using the base surahs list to keep full data intact
+              const nextSurah = surahs.find(s => s.id === nextSurahFiltered.id) || nextSurahFiltered;
+              setCurrentSurah(nextSurah);
             }
           }
         }
@@ -293,6 +322,10 @@ function App() {
       audioRef.current.loop = isReplayEnabled;
     }
   }, [isReplayEnabled, currentSurah]);
+
+  const handleFilteredSurahsChange = (filtered) => {
+    filteredSurahsRef.current = filtered;
+  };
 
   const handleSurahSelect = (surah) => {
     const audioUrl = getSurahAudioUrl(surah);
@@ -492,6 +525,7 @@ function App() {
         surahs={surahs}
         currentSurah={currentSurah}
         onSurahSelect={handleSurahSelect}
+        onFilteredSurahsChange={handleFilteredSurahsChange}
         autoPlayNext={autoPlayNext}
         onAutoPlayNextChange={setAutoPlayNext}
         isPlaying={isPlaying}
@@ -514,7 +548,7 @@ function App() {
       
       <footer className="w-full py-6 mt-8 border-t border-slate-800">
         <div className="text-center text-slate-400 text-sm">
-          Created by <span className="text-slate-300 font-semibold">AmanahDigital1447</span>
+          Created by <a href="https://amanahdigital.co.uk" target="_blank" rel="noopener noreferrer" className="text-slate-300 font-semibold hover:text-white transition-colors">AmanahDigital</a>
         </div>
       </footer>
     </div>
