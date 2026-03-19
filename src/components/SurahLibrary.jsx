@@ -153,11 +153,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
   }, [filteredSurahs, onFilteredSurahsChange]);
 
   return (
-    <main className="pt-20 pb-8 px-4 min-h-screen bg-brand-void">
+    <main className="pt-20 pb-4 px-4 flex-1 bg-brand-void">
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center py-1">
-          <h1 className="text-2xl font-semibold text-brand-gold italic tracking-tight mb-0.5 flex items-center justify-center gap-2">
-            Sadaqah Jariyah Radio <Radio size={24} className="text-brand-gold" />
+          <h1 className="font-display text-2xl font-semibold text-brand-gold italic tracking-tight mb-0.5 flex items-center justify-center gap-2">
+            Sadaqah Jariyah Radio <Radio size={22} className="text-brand-gold" style={{ opacity: 0.7 }} />
           </h1>
           <p className="text-xs flex items-center justify-center gap-1 font-brand-mono" style={{ color: 'var(--text-faint)' }}>
             Select a Surah to begin listening
@@ -629,7 +629,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           <div className="mb-4">
             <button
               onClick={onPlayRandom}
-              className="w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-brand-gold hover:bg-brand-gold-mid text-brand-void shadow-lg flex items-center justify-center gap-2 mb-4 active:scale-[0.97]"
+              className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all text-brand-void shadow-lg flex items-center justify-center gap-2 mb-4 active:scale-[0.97]"
+              style={{ background: 'linear-gradient(135deg, #F5C97A 0%, #C8884A 100%)' }}
             >
               <Shuffle size={18} />
               Play Random
@@ -638,27 +639,23 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           <div className="mb-4 flex gap-2">
             <button
               onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all
-                ${showOnlyWithAudio
-                  ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
-                  : 'bg-brand-elevated hover:bg-[#1c1930]'
-                }
-              `}
-              style={!showOnlyWithAudio ? { color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' } : {}}
+              className="flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all"
+              style={{
+                background: showOnlyWithAudio ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: showOnlyWithAudio ? '#F5C97A' : 'var(--text-muted)',
+                border: showOnlyWithAudio ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               With audio only
             </button>
             <button
               onClick={() => onAutoPlayNextChange(!autoPlayNext)}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all
-                ${autoPlayNext
-                  ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
-                  : 'bg-brand-elevated hover:bg-[#1c1930]'
-                }
-              `}
-              style={!autoPlayNext ? { color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' } : {}}
+              className="flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all"
+              style={{
+                background: autoPlayNext ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: autoPlayNext ? '#F5C97A' : 'var(--text-muted)',
+                border: autoPlayNext ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               Auto play next
             </button>
@@ -668,14 +665,12 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           <div className="mb-4 relative">
             <button
               onClick={() => setShowReciterFilter(!showReciterFilter)}
-              className={`
-                w-full px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all flex items-center justify-between gap-2
-                ${selectedReciterFilter !== 'all'
-                  ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
-                  : 'bg-brand-elevated hover:bg-[#1c1930]'
-                }
-              `}
-              style={selectedReciterFilter === 'all' ? { color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' } : {}}
+              className="w-full px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all flex items-center justify-between gap-2"
+              style={{
+                background: selectedReciterFilter !== 'all' ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: selectedReciterFilter !== 'all' ? '#F5C97A' : 'var(--text-muted)',
+                border: selectedReciterFilter !== 'all' ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               <span className="flex items-center gap-2">
                 <Filter size={14} />
@@ -758,15 +753,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                 key={surah.id}
                 className={`w-full rounded-2xl transition-all`}
                 style={{
-                  background: !hasAudio ? '#14112a' : isActive ? '#F5C97A' : '#0e0c1a',
+                  background: !hasAudio ? '#14112a' : isActive ? 'rgba(245,201,122,0.07)' : '#0e0c1a',
                   border: !hasAudio
                     ? '1px solid rgba(255,255,255,0.06)'
                     : isActive
-                    ? '1px solid #F5C97A'
-                    : '1px solid rgba(255,255,255,0.06)',
-                  opacity: !hasAudio ? 0.5 : 1,
+                    ? '1px solid rgba(245,201,122,0.30)'
+                    : '1px solid rgba(255,255,255,0.07)',
+                  opacity: !hasAudio ? 0.45 : 1,
                   cursor: !hasAudio ? 'not-allowed' : 'default',
-                  boxShadow: isActive ? '0 4px 24px rgba(245,201,122,0.15)' : undefined,
                 }}
               >
                 <div className="flex items-center justify-between gap-3 p-4">
@@ -778,13 +772,15 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {isActive && (
-                      <span className="text-[9px] font-brand-mono font-bold uppercase tracking-widest" style={{ color: 'rgba(8,6,16,0.6)' }}>
+                      <span className="text-[9px] font-brand-mono font-medium uppercase tracking-widest text-brand-gold" style={{ opacity: 0.7 }}>
                         • PLAYING
                       </span>
                     )}
                   </div>
-                  <div className={`font-semibold text-sm ${!hasAudio ? '' : isActive ? 'text-brand-void' : 'text-brand-text'}`}
-                    style={!hasAudio ? { color: 'var(--text-faint)' } : {}}>
+                  <div
+                    className={`font-medium text-[15px] leading-snug ${isActive ? 'text-brand-text' : 'text-brand-text'}`}
+                    style={!hasAudio ? { color: 'var(--text-faint)' } : {}}
+                  >
                     {surah.name}{surah.nameArabic ? ` | ${surah.nameArabic}` : ''}
                   </div>
                   {hasAudio && selectedOption && (
@@ -795,8 +791,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                           setExpandedSurah(isExpanded ? null : surah.id);
                         }
                       }}
-                      className={`text-[10px] mt-1 flex items-center gap-1 hover:underline font-brand-mono`}
-                      style={{ color: isActive ? 'rgba(8,6,16,0.55)' : 'var(--text-faint)' }}
+                      className="text-[11px] mt-1 flex items-center gap-1 hover:underline font-brand-mono"
+                      style={{ color: 'var(--text-faint)' }}
                       aria-label="Select reciter"
                     >
                       Reciter: {selectedOption.isClip ? (selectedOption.reciter || selectedAudioName) : selectedAudioName}
@@ -814,11 +810,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                         e.stopPropagation();
                         onReplayToggle();
                       }}
-                      className={`p-2 rounded-xl transition-all ${
-                        isReplayEnabled
-                          ? 'bg-brand-void/20 hover:bg-brand-void/30 text-brand-void'
-                          : 'bg-brand-void/10 hover:bg-brand-void/20 text-brand-void/60'
-                      }`}
+                      className="p-2 rounded-xl transition-all"
+                      style={{
+                        background: isReplayEnabled ? 'rgba(245,201,122,0.15)' : 'rgba(255,255,255,0.06)',
+                        color: isReplayEnabled ? '#F5C97A' : 'var(--text-faint)',
+                      }}
                       aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
                     >
                       <Repeat size={16} />
@@ -836,35 +832,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       }
                     }}
                     disabled={!hasAudio}
-                    className={`p-2 rounded-xl transition-all ${
-                      !hasAudio
-                        ? 'cursor-not-allowed'
-                        : isActive
-                        ? 'bg-brand-void/20 hover:bg-brand-void/30'
-                        : 'bg-brand-elevated hover:bg-[#1c1930]'
-                    }`}
+                    className="p-2 rounded-xl transition-all"
+                    style={{
+                      background: !hasAudio ? 'transparent' : isActive ? 'rgba(245,201,122,0.15)' : 'rgba(255,255,255,0.06)',
+                      cursor: !hasAudio ? 'not-allowed' : 'pointer',
+                    }}
                     aria-label={hasAudio ? (isActive && isPlaying ? 'Pause' : 'Play') : 'No audio available'}
                   >
                     {isActive && isPlaying ? (
-                      <Pause
-                        size={16}
-                        className="text-brand-void"
-                        fill="currentColor"
-                      />
+                      <Pause size={16} style={{ color: '#F5C97A' }} fill="currentColor" />
                     ) : (
                       <Play
                         size={16}
-                        style={{ color: !hasAudio ? 'var(--text-faint)' : isActive ? '#080610' : 'var(--text-muted)' }}
-                        fill={!hasAudio ? 'none' : isActive ? 'currentColor' : 'none'}
+                        style={{ color: !hasAudio ? 'var(--text-faint)' : isActive ? '#F5C97A' : 'var(--text-muted)' }}
+                        fill={isActive ? 'currentColor' : 'none'}
                       />
                     )}
                   </button>
                 </div>
                 </div>
                 {isExpanded && surah.audioOptions && surah.audioOptions.length > 0 && (
-                  <div className="px-4 pb-4 mt-2" style={{ borderTop: `1px solid ${isActive ? 'rgba(8,6,16,0.15)' : 'var(--border-subtle)'}` }}>
+                  <div className="px-4 pb-4 mt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                     <div className="pt-3 space-y-1">
-                      <div className="text-[10px] font-brand-mono mb-2 uppercase tracking-wider" style={{ color: isActive ? 'rgba(8,6,16,0.5)' : 'var(--text-faint)' }}>Select Reciter:</div>
+                      <div className="text-[10px] font-brand-mono mb-2 uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>Select Reciter:</div>
                       {surah.audioOptions.map((option) => {
                         const reciterName = option.reciter || option.name;
                         const description = getReciterDescription(reciterName);
@@ -873,12 +863,9 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                             key={option.name}
                             className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all"
                             style={{
-                              background: selectedAudioName === option.name
-                                ? isActive ? 'rgba(8,6,16,0.2)' : 'rgba(245,201,122,0.15)'
-                                : isActive ? 'rgba(8,6,16,0.1)' : '#14112a',
-                              color: selectedAudioName === option.name
-                                ? isActive ? '#080610' : '#F5C97A'
-                                : isActive ? 'rgba(8,6,16,0.7)' : 'var(--text-muted)',
+                              background: selectedAudioName === option.name ? 'rgba(245,201,122,0.10)' : '#14112a',
+                              color: selectedAudioName === option.name ? '#F5C97A' : 'var(--text-muted)',
+                              border: selectedAudioName === option.name ? '1px solid rgba(245,201,122,0.20)' : '1px solid transparent',
                             }}
                           >
                             <button
@@ -899,6 +886,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                                 setShowReciterInfo({ reciterName, description });
                               }}
                               className="p-1 rounded hover:bg-white/10 transition-all flex-shrink-0"
+                              style={{ color: 'var(--text-faint)' }}
                               aria-label="Reciter information"
                             >
                               <Info size={16} />

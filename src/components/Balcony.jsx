@@ -60,7 +60,8 @@ export default function Balcony({
           <div ref={containerRef} className="flex-shrink-0 max-w-[calc(50%-80px)] overflow-hidden">
             <div
               ref={textRef}
-              className={`text-brand-text font-semibold text-base whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
+              className={`text-brand-text font-medium text-[15px] whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
+              style={{ opacity: 0.85 }}
             >
               {shouldScroll
                 ? `${baseText} ••• ${baseText} ••• ${baseText} ••• ${baseText} •••`

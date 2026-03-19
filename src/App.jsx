@@ -505,7 +505,7 @@ function App() {
   })() : null;
 
   return (
-    <div className="min-h-screen bg-brand-void text-brand-text">
+    <div className="min-h-screen bg-brand-void text-brand-text flex flex-col">
       <Balcony
         currentSurah={currentSurah}
         currentAudioOption={currentAudioOption}
@@ -546,9 +546,19 @@ function App() {
         onShowTranslationChange={setShowTranslation}
       />
       
-      <footer className="w-full py-6 mt-8 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="text-center text-sm font-brand-mono" style={{ color: 'var(--text-faint)' }}>
-          Created by <a href="https://amanahdigital.co.uk" target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:text-brand-gold-mid transition-colors font-medium">AmanahDigital</a>
+      <footer className="w-full py-5 mt-auto border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="text-center">
+          <span className="text-xs font-brand-mono block mb-1" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>POWERED BY</span>
+          <a
+            href="https://amanahdigital.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-display text-lg italic text-brand-gold hover:text-brand-gold-mid transition-colors inline-flex items-center gap-1.5"
+            style={{ textDecoration: 'none' }}
+          >
+            AmanahDigital
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.6 }}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
         </div>
       </footer>
     </div>
