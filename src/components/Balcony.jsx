@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Radio, Repeat, Menu } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 
-export default function Balcony({ 
-  currentSurah, 
+export default function Balcony({
+  currentSurah,
   currentAudioOption,
-  isPlaying, 
-  onPlayPause, 
-  onNext, 
-  onPrevious, 
-  progress, 
+  isPlaying,
+  onPlayPause,
+  onNext,
+  onPrevious,
+  progress,
   duration,
   version,
   onMenuSelect,
@@ -44,24 +44,26 @@ export default function Balcony({
     }
   }, [currentSurah, currentAudioOption]);
   return (
-    <header 
-      className="fixed top-0 left-0 right-0 z-50 bg-orange-500 shadow-lg"
+    <header
+      className="fixed top-0 left-0 right-0 z-50 bg-brand-surface shadow-lg"
+      style={{ borderBottom: '1px solid var(--border-gold)' }}
       role="banner"
     >
       {/* Version number in corner */}
       <div className="absolute top-0.5 right-1 z-10">
-        <span className="text-white/60 font-normal text-[10px]">v{version}</span>
+        <span className="font-brand-mono font-normal text-[10px]" style={{ color: 'var(--text-faint)' }}>v{version}</span>
       </div>
-      
+
       <div className="px-4 py-4">
         <div className="flex items-center justify-between relative">
           {/* Left: Surah Name */}
           <div ref={containerRef} className="flex-shrink-0 max-w-[calc(50%-80px)] overflow-hidden">
-            <div 
+            <div
               ref={textRef}
-              className={`text-white font-bold text-base whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
+              className={`text-brand-text font-medium text-[15px] whitespace-nowrap ${shouldScroll ? 'animate-scroll' : ''}`}
+              style={{ opacity: 0.85 }}
             >
-              {shouldScroll 
+              {shouldScroll
                 ? `${baseText} ••• ${baseText} ••• ${baseText} ••• ${baseText} •••`
                 : baseText}
             </div>
@@ -71,38 +73,38 @@ export default function Balcony({
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
             <button
               onClick={onPrevious}
-              className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white disabled:opacity-40 transition-all active:scale-95"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text disabled:opacity-40 transition-all active:scale-95"
               aria-label="Previous"
               disabled={!currentSurah}
             >
               <SkipBack size={18} />
             </button>
-            
+
             <button
               onClick={onPlayPause}
-              className="p-2.5 rounded-full bg-white hover:bg-white/90 text-orange-500 disabled:opacity-40 transition-all shadow-lg active:scale-95"
+              className="p-2.5 rounded-full bg-brand-gold hover:bg-brand-gold-mid text-brand-void disabled:opacity-40 transition-all shadow-lg active:scale-95"
               aria-label={isPlaying ? 'Pause' : 'Play'}
               disabled={!currentSurah}
             >
               {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-0.5" />}
             </button>
-            
+
             <button
               onClick={onReplayToggle}
               className={`p-2 rounded-full transition-all active:scale-95 ${
                 isReplayEnabled
-                  ? 'bg-white text-orange-500 hover:bg-white/90'
-                  : 'bg-white/20 hover:bg-white/30 text-white'
+                  ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
+                  : 'bg-white/10 hover:bg-white/20 text-brand-text'
               } disabled:opacity-40`}
               aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
               disabled={!currentSurah}
             >
               <Repeat size={18} />
             </button>
-            
+
             <button
               onClick={onNext}
-              className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white disabled:opacity-40 transition-all active:scale-95"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text disabled:opacity-40 transition-all active:scale-95"
               aria-label="Next"
               disabled={!currentSurah}
             >
@@ -114,7 +116,7 @@ export default function Balcony({
           <div className="flex-shrink-0 relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text transition-all"
               aria-label="Menu"
             >
               <Menu size={20} />
@@ -122,31 +124,34 @@ export default function Balcony({
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 top-full mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden min-w-[150px]">
+                <div
+                  className="absolute right-0 top-full mt-2 bg-brand-surface rounded-xl shadow-2xl z-50 overflow-hidden min-w-[150px]"
+                  style={{ border: '1px solid var(--border-mid)' }}
+                >
                   <button
                     onClick={() => { onMenuSelect('about'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
                   >
                     About Us
                   </button>
-                  <div className="h-px bg-slate-700" />
+                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
                   <button
                     onClick={() => { onMenuSelect('bookmark'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
                   >
                     Bookmark
                   </button>
-                  <div className="h-px bg-slate-700" />
+                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
                   <button
                     onClick={() => { onMenuSelect('community'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
                   >
                     Community
                   </button>
-                  <div className="h-px bg-slate-700" />
+                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
                   <button
                     onClick={() => { onMenuSelect('settings'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-slate-200 hover:bg-slate-800 hover:text-white transition-all"
+                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
                   >
                     Settings
                   </button>

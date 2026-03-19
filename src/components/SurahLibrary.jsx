@@ -153,17 +153,18 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
   }, [filteredSurahs, onFilteredSurahsChange]);
 
   return (
-    <main className="pt-20 pb-8 px-4 min-h-screen bg-slate-950">
+    <main className="pt-20 pb-4 px-4 flex-1 bg-brand-void">
       <div className="max-w-md mx-auto space-y-6">
         <div className="text-center py-1">
-          <h1 className="text-2xl font-black text-white italic tracking-tighter mb-0.5 flex items-center justify-center gap-2">
-            Sadaqah Jariyah Radio <Radio size={24} className="text-white" />
+          <h1 className="font-display text-2xl font-semibold text-brand-gold italic tracking-tight mb-0.5 flex items-center justify-center gap-2">
+            Sadaqah Jariyah Radio <Radio size={22} className="text-brand-gold" style={{ opacity: 0.7 }} />
           </h1>
-          <p className="text-slate-500 text-xs flex items-center justify-center gap-1">
+          <p className="text-xs flex items-center justify-center gap-1 font-brand-mono" style={{ color: 'var(--text-faint)' }}>
             Select a Surah to begin listening
             <button
               onClick={() => setShowHelp(true)}
-              className="text-slate-400 hover:text-slate-300 transition-colors"
+              className="hover:text-brand-gold transition-colors"
+              style={{ color: 'var(--text-faint)' }}
               aria-label="Show help"
             >
               <HelpCircle size={14} />
@@ -173,37 +174,38 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         
         {/* Help Modal */}
         {showHelp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowHelp(false)}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowHelp(false)}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">How to Use</h2>
+                <h2 className="text-xl font-semibold text-brand-text">How to Use</h2>
                 <button
                   onClick={() => setShowHelp(false)}
-                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <div className="text-slate-300 text-sm leading-relaxed space-y-4">
+              <div className="text-sm leading-relaxed space-y-4" style={{ color: 'var(--text-muted)' }}>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">About Clips:</h3>
+                  <h3 className="text-brand-text font-semibold mb-2">About Clips:</h3>
                   <p>This app features audio clips - specific verse ranges or segments of surahs. Each clip shows the verse range (e.g., 1-7) so you know which verses are included.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Selecting a Reciter:</h3>
+                  <h3 className="text-brand-text font-semibold mb-2">Selecting a Reciter:</h3>
                   <p>Click on a surah to see available reciters. Then click on "Reciter: [name]" to expand the list and choose from different reciters or audio clips with specific verse ranges.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Reciter Filter:</h3>
+                  <h3 className="text-brand-text font-semibold mb-2">Reciter Filter:</h3>
                   <p>Use the filter button (with the filter icon) above the search bar to filter all surahs by a specific reciter. This will show only surahs that have recordings from the selected reciter. Select "All Reciters" to see all available surahs again.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Verses Display:</h3>
+                  <h3 className="text-brand-text font-semibold mb-2">Verses Display:</h3>
                   <p>When you select a recitation with a verse range, the verses section will appear below the surah list showing the Arabic text of those verses. You can collapse or expand this section using the chevron button. The verses are displayed with their verse numbers for easy reference.</p>
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold mb-2">Tips:</h3>
+                  <h3 className="text-brand-text font-semibold mb-2">Tips:</h3>
                   <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>Use the search bar to find surahs quickly</li>
                     <li>Enable "With audio only" to filter surahs that have available recordings</li>
@@ -219,19 +221,20 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         
         {/* Reciter Info Modal */}
         {showReciterInfo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowReciterInfo(null)}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowReciterInfo(null)}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">{showReciterInfo.reciterName}</h2>
+                <h2 className="text-xl font-semibold text-brand-text">{showReciterInfo.reciterName}</h2>
                 <button
                   onClick={() => setShowReciterInfo(null)}
-                  className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <div className="text-slate-300 text-sm leading-relaxed">
+              <div className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 <p>{showReciterInfo.description}</p>
               </div>
             </div>
@@ -240,27 +243,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         
         {/* About Us Modal */}
         {menuSection === 'about' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-bold text-white">About Us</h2>
+                <h2 className="text-xl font-semibold text-brand-text">About Us</h2>
                 <button
                   onClick={onCloseMenu}
-                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
                 </button>
               </div>
               {/* Tabs */}
-              <div className="flex gap-2 mb-4 border-b border-slate-700 flex-shrink-0">
+              <div className="flex gap-2 mb-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <button
                   onClick={() => setAboutTab('mission')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     aboutTab === 'mission'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: aboutTab === 'mission' ? undefined : 'var(--text-muted)' }}
                 >
                   Mission
                 </button>
@@ -268,9 +273,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   onClick={() => setAboutTab('dua')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     aboutTab === 'dua'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: aboutTab === 'dua' ? undefined : 'var(--text-muted)' }}
                 >
                   Dua
                 </button>
@@ -278,24 +284,25 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   onClick={() => setAboutTab('amanahdigital')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     aboutTab === 'amanahdigital'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: aboutTab === 'amanahdigital' ? undefined : 'var(--text-muted)' }}
                 >
                   AmanahDigital1447
                 </button>
               </div>
 
-              <div className="text-slate-300 text-sm leading-relaxed space-y-3 overflow-y-auto text-center">
+              <div className="text-sm leading-relaxed space-y-3 overflow-y-auto text-center" style={{ color: 'var(--text-muted)' }}>
                 {aboutTab === 'mission' && (
                   <>
                     <p>
                       The purpose of this website is to listen to Quran recitation of those who have returned to our Creator, and insha'allah this will be sadaqah jariya for them. May Allah accept their ibadah.
                     </p>
-                    <p className="text-center font-semibold text-white mt-4">
+                    <p className="text-center font-semibold text-brand-text mt-4">
                       May Allah accept this as reward for my parents.
                     </p>
-                    <p className="text-center font-semibold text-white">
+                    <p className="text-center font-semibold text-brand-text">
                       In memory of Shiekh Magdi Osman.
                     </p>
                   </>
@@ -317,7 +324,7 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       href="https://amanahdigital.co.uk"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block mt-1 text-indigo-400 hover:text-indigo-300 underline transition-colors"
+                      className="inline-block mt-1 text-brand-gold hover:text-brand-gold-mid underline transition-colors"
                     >
                       amanahdigital.co.uk
                     </a>
@@ -330,27 +337,28 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
         {/* Bookmark Modal */}
         {menuSection === 'bookmark' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-bold text-white">Bookmark</h2>
+                <h2 className="text-xl font-semibold text-brand-text">Bookmark</h2>
                 <button
                   onClick={onCloseMenu}
-                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
                 </button>
               </div>
-              <div className="text-slate-300 text-sm leading-relaxed text-center">
-                <h3 className="text-white font-semibold mb-3">Add to iPhone Home Screen</h3>
+              <div className="text-sm leading-relaxed text-center" style={{ color: 'var(--text-muted)' }}>
+                <h3 className="text-brand-text font-semibold mb-3">Add to iPhone Home Screen</h3>
                 <ol className="space-y-2 list-decimal list-inside">
-                  <li>Open this website in <span className="font-semibold text-white">Safari</span></li>
-                  <li>Tap the <span className="font-semibold text-white">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
-                  <li>Scroll down and tap <span className="font-semibold text-white">Add to Home Screen</span></li>
-                  <li>Tap <span className="font-semibold text-white">Add</span> in the top right corner</li>
+                  <li>Open this website in <span className="font-semibold text-brand-text">Safari</span></li>
+                  <li>Tap the <span className="font-semibold text-brand-text">Share</span> button at the bottom of the screen (the square with an arrow pointing up)</li>
+                  <li>Scroll down and tap <span className="font-semibold text-brand-text">Add to Home Screen</span></li>
+                  <li>Tap <span className="font-semibold text-brand-text">Add</span> in the top right corner</li>
                 </ol>
-                <p className="mt-3 text-slate-400 text-xs">The app will appear on your home screen and open in full screen, just like a native app.</p>
+                <p className="mt-3 text-xs" style={{ color: 'var(--text-faint)' }}>The app will appear on your home screen and open in full screen, just like a native app.</p>
               </div>
             </div>
           </div>
@@ -358,13 +366,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
         {/* Community Modal */}
         {menuSection === 'community' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-bold text-white">Community</h2>
+                <h2 className="text-xl font-semibold text-brand-text">Community</h2>
                 <button
                   onClick={onCloseMenu}
-                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
@@ -372,14 +381,15 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
               </div>
 
               {/* Tabs */}
-              <div className="flex gap-2 mb-4 border-b border-slate-700 flex-shrink-0">
+              <div className="flex gap-2 mb-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <button
                   onClick={() => setCommunitySection('upload')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     communitySection === 'upload'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: communitySection === 'upload' ? undefined : 'var(--text-muted)' }}
                 >
                   Upload
                 </button>
@@ -387,9 +397,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   onClick={() => setCommunitySection('stats')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     communitySection === 'stats'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: communitySection === 'stats' ? undefined : 'var(--text-muted)' }}
                 >
                   Stats
                 </button>
@@ -397,9 +408,10 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   onClick={() => setCommunitySection('feedback')}
                   className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
                     communitySection === 'feedback'
-                      ? 'text-white border-b-2 border-indigo-500'
-                      : 'text-slate-400 hover:text-slate-300'
+                      ? 'text-brand-text border-b-2 border-brand-gold'
+                      : 'hover:text-brand-text'
                   }`}
+                  style={{ color: communitySection === 'feedback' ? undefined : 'var(--text-muted)' }}
                 >
                   Feedback
                 </button>
@@ -408,29 +420,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
               {/* Content */}
               <div
                 ref={contentContainerRef}
-                className="text-slate-300 text-sm leading-relaxed space-y-3 overflow-y-auto relative text-center"
-                style={{ minHeight: contentHeight > 0 ? `${contentHeight}px` : 'auto' }}
+                className="text-sm leading-relaxed space-y-3 overflow-y-auto relative text-center"
+                style={{ minHeight: contentHeight > 0 ? `${contentHeight}px` : 'auto', color: 'var(--text-muted)' }}
               >
                 {/* Hidden sections for measurement */}
                 <div ref={uploadRef} className="absolute opacity-0 pointer-events-none invisible">
                   <p>
-                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
+                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-brand-text">amanahdigital1447@gmail.com</span>
                   </p>
                 </div>
 
                 <div ref={statsRef} className="absolute opacity-0 pointer-events-none invisible">
                   <div>
-                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
+                    <h3 className="text-brand-text font-semibold mb-3">Listening Statistics</h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="mb-1"><span className="font-semibold text-white">Your Listening Time:</span></p>
-                        <p className="text-slate-300">{formatListeningTime(totalListeningTime)}</p>
-                        <p className="text-xs text-slate-400 mt-1">Your personal listening time (saved locally)</p>
+                        <p className="mb-1"><span className="font-semibold text-brand-text">Your Listening Time:</span></p>
+                        <p>{formatListeningTime(totalListeningTime)}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Your personal listening time (saved locally)</p>
                       </div>
-                      <div className="border-t border-slate-700 pt-3">
-                        <p className="mb-1"><span className="font-semibold text-white">Global Listening Time:</span></p>
-                        <p className="text-slate-300">{formatListeningTime(0)}</p>
-                        <p className="text-xs text-slate-400 mt-1">Combined listening time from all users worldwide</p>
+                      <div className="pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                        <p className="mb-1"><span className="font-semibold text-brand-text">Global Listening Time:</span></p>
+                        <p>{formatListeningTime(0)}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Combined listening time from all users worldwide</p>
                       </div>
                     </div>
                   </div>
@@ -438,18 +450,18 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
                 <div ref={feedbackRef} className="absolute opacity-0 pointer-events-none invisible">
                   <div>
-                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
-                    <p className="mb-4 text-slate-300">If you encounter any issues with the website or have feedback, please fill out the form below.</p>
+                    <h3 className="text-brand-text font-semibold mb-3">Feedback</h3>
+                    <p className="mb-4">If you encounter any issues with the website or have feedback, please fill out the form below.</p>
                     <form className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Subject</label>
-                        <input type="text" className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500" placeholder="Brief description of the issue" />
+                        <label className="block text-sm font-medium text-brand-text mb-2">Subject</label>
+                        <input type="text" className="w-full px-3 py-2 bg-brand-elevated rounded-lg text-brand-text" style={{ border: '1px solid var(--border-subtle)' }} placeholder="Brief description of the issue" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Message</label>
-                        <textarea rows={5} className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 resize-none" placeholder="Please describe the issue..." />
+                        <label className="block text-sm font-medium text-brand-text mb-2">Message</label>
+                        <textarea rows={5} className="w-full px-3 py-2 bg-brand-elevated rounded-lg text-brand-text resize-none" style={{ border: '1px solid var(--border-subtle)' }} placeholder="Please describe the issue..." />
                       </div>
-                      <button type="submit" className="w-full px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg">Send Feedback</button>
+                      <button type="submit" className="w-full px-4 py-2 bg-brand-gold text-brand-void font-medium rounded-lg">Send Feedback</button>
                     </form>
                   </div>
                 </div>
@@ -457,29 +469,29 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                 {/* Visible content */}
                 {communitySection === 'upload' && (
                   <p>
-                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-white">amanahdigital1447@gmail.com</span>
+                    If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-brand-text">amanahdigital1447@gmail.com</span>
                   </p>
                 )}
 
                 {communitySection === 'stats' && (
                   <div>
-                    <h3 className="text-white font-semibold mb-3">Listening Statistics</h3>
+                    <h3 className="text-brand-text font-semibold mb-3">Listening Statistics</h3>
                     <div className="space-y-3">
                       <div>
-                        <p className="mb-1"><span className="font-semibold text-white">Your Listening Time:</span></p>
-                        <p className="text-slate-300">{formatListeningTime(totalListeningTime)}</p>
-                        <p className="text-xs text-slate-400 mt-1">Your personal listening time (saved locally)</p>
+                        <p className="mb-1"><span className="font-semibold text-brand-text">Your Listening Time:</span></p>
+                        <p>{formatListeningTime(totalListeningTime)}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Your personal listening time (saved locally)</p>
                       </div>
-                      <div className="border-t border-slate-700 pt-3">
-                        <p className="mb-1"><span className="font-semibold text-white">Global Listening Time:</span></p>
+                      <div className="pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                        <p className="mb-1"><span className="font-semibold text-brand-text">Global Listening Time:</span></p>
                         {globalListeningTime === undefined ? (
-                          <p className="text-slate-400 text-sm">Loading...</p>
+                          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>Loading...</p>
                         ) : globalListeningTime === null ? (
-                          <p className="text-slate-400 text-sm">Not available</p>
+                          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>Not available</p>
                         ) : (
                           <>
-                            <p className="text-slate-300">{formatListeningTime(globalListeningTime)}</p>
-                            <p className="text-xs text-slate-400 mt-1">Combined listening time from all users worldwide</p>
+                            <p>{formatListeningTime(globalListeningTime)}</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Combined listening time from all users worldwide</p>
                           </>
                         )}
                       </div>
@@ -489,8 +501,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
                 {communitySection === 'feedback' && (
                   <div>
-                    <h3 className="text-white font-semibold mb-3">Feedback</h3>
-                    <p className="mb-4 text-slate-300">
+                    <h3 className="text-brand-text font-semibold mb-3">Feedback</h3>
+                    <p className="mb-4">
                       If you encounter any issues with the website or have feedback, please fill out the form below. This will open your email client to send a message to us.
                     </p>
                     <form
@@ -507,31 +519,33 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       className="space-y-4"
                     >
                       <div>
-                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-white mb-2">Subject</label>
+                        <label htmlFor="feedback-subject" className="block text-sm font-medium text-brand-text mb-2">Subject</label>
                         <input
                           type="text"
                           id="feedback-subject"
                           value={feedbackForm.subject}
                           onChange={(e) => setFeedbackForm({ ...feedbackForm, subject: e.target.value })}
-                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 bg-brand-elevated rounded-lg text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                          style={{ border: '1px solid var(--border-subtle)' }}
                           placeholder="Brief description of the issue"
                         />
                       </div>
                       <div>
-                        <label htmlFor="feedback-message" className="block text-sm font-medium text-white mb-2">Message</label>
+                        <label htmlFor="feedback-message" className="block text-sm font-medium text-brand-text mb-2">Message</label>
                         <textarea
                           id="feedback-message"
                           rows={5}
                           value={feedbackForm.message}
                           onChange={(e) => setFeedbackForm({ ...feedbackForm, message: e.target.value })}
-                          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                          className="w-full px-3 py-2 bg-brand-elevated rounded-lg text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-gold resize-none"
+                          style={{ border: '1px solid var(--border-subtle)' }}
                           placeholder="Please describe the issue or provide your feedback..."
                           required
                         />
                       </div>
                       <button
                         type="submit"
-                        className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all"
+                        className="w-full px-4 py-2 bg-brand-gold hover:bg-brand-gold-mid text-brand-void font-medium rounded-lg transition-all"
                       >
                         Send Feedback
                       </button>
@@ -545,13 +559,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
         {/* Settings Modal */}
         {menuSection === 'settings' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCloseMenu}>
-            <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-6">
-                <h2 className="text-xl font-bold text-white">Settings</h2>
+                <h2 className="text-xl font-semibold text-brand-text">Settings</h2>
                 <button
                   onClick={onCloseMenu}
-                  className="absolute right-0 p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+                  className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
                   <X size={20} />
@@ -560,26 +575,28 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Quran Script</h3>
+                  <h3 className="text-xs font-brand-mono font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>Quran Script</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => onScriptTypeChange('uthmani')}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
+                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                         scriptType === 'uthmani'
-                          ? 'bg-indigo-600 border-indigo-500 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
+                          ? 'bg-brand-gold text-brand-void'
+                          : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
                       }`}
+                      style={scriptType !== 'uthmani' ? { border: '1px solid var(--border-subtle)' } : {}}
                     >
                       <div className="font-semibold">Uthmani</div>
                       <div className="text-xs opacity-70 mt-0.5">Madani Mushaf</div>
                     </button>
                     <button
                       onClick={() => onScriptTypeChange('indopak')}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
+                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                         scriptType === 'indopak'
-                          ? 'bg-indigo-600 border-indigo-500 text-white'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white'
+                          ? 'bg-brand-gold text-brand-void'
+                          : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
                       }`}
+                      style={scriptType !== 'indopak' ? { border: '1px solid var(--border-subtle)' } : {}}
                     >
                       <div className="font-semibold">IndoPak</div>
                       <div className="text-xs opacity-70 mt-0.5">Nastaleeq Style</div>
@@ -588,17 +605,18 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Translation</h3>
+                  <h3 className="text-xs font-brand-mono font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>Translation</h3>
                   <button
                     onClick={() => onShowTranslationChange(!showTranslation)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-all"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-brand-elevated hover:bg-[#1c1930] transition-all"
+                    style={{ border: '1px solid var(--border-subtle)' }}
                   >
                     <div className="text-left">
-                      <div className="text-sm font-semibold text-white">English Translation</div>
-                      <div className="text-xs text-slate-400 mt-0.5">Saheeh International</div>
+                      <div className="text-sm font-semibold text-brand-text">English Translation</div>
+                      <div className="text-xs mt-0.5" style={{ color: 'var(--text-faint)' }}>Saheeh International</div>
                     </div>
-                    <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${showTranslation ? 'bg-indigo-600' : 'bg-slate-600'}`}>
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${showTranslation ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${showTranslation ? 'bg-brand-gold' : 'bg-brand-elevated'}`} style={!showTranslation ? { border: '1px solid var(--border-mid)' } : {}}>
+                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-brand-void shadow transition-transform ${showTranslation ? 'translate-x-5' : 'translate-x-0'}`} />
                     </div>
                   </button>
                 </div>
@@ -607,11 +625,12 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           </div>
         )}
 
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+        <div className="bg-brand-surface rounded-3xl shadow-2xl p-4" style={{ border: '1px solid var(--border-subtle)' }}>
           <div className="mb-4">
             <button
               onClick={onPlayRandom}
-              className="w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg flex items-center justify-center gap-2 mb-4"
+              className="w-full px-4 py-3 rounded-xl text-sm font-medium transition-all text-brand-void shadow-lg flex items-center justify-center gap-2 mb-4 active:scale-[0.97]"
+              style={{ background: 'linear-gradient(135deg, #F5C97A 0%, #C8884A 100%)' }}
             >
               <Shuffle size={18} />
               Play Random
@@ -620,41 +639,38 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           <div className="mb-4 flex gap-2">
             <button
               onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
-                ${showOnlyWithAudio
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }
-              `}
+              className="flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all"
+              style={{
+                background: showOnlyWithAudio ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: showOnlyWithAudio ? '#F5C97A' : 'var(--text-muted)',
+                border: showOnlyWithAudio ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               With audio only
             </button>
             <button
               onClick={() => onAutoPlayNextChange(!autoPlayNext)}
-              className={`
-                flex-1 px-3 py-2 rounded-xl text-xs font-medium transition-all
-                ${autoPlayNext
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }
-              `}
+              className="flex-1 px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all"
+              style={{
+                background: autoPlayNext ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: autoPlayNext ? '#F5C97A' : 'var(--text-muted)',
+                border: autoPlayNext ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               Auto play next
             </button>
           </div>
-          
+
           {/* Reciter Filter */}
           <div className="mb-4 relative">
             <button
               onClick={() => setShowReciterFilter(!showReciterFilter)}
-              className={`
-                w-full px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between gap-2
-                ${selectedReciterFilter !== 'all'
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }
-              `}
+              className="w-full px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all flex items-center justify-between gap-2"
+              style={{
+                background: selectedReciterFilter !== 'all' ? 'rgba(245,201,122,0.10)' : 'rgba(255,255,255,0.04)',
+                color: selectedReciterFilter !== 'all' ? '#F5C97A' : 'var(--text-muted)',
+                border: selectedReciterFilter !== 'all' ? '1px solid rgba(245,201,122,0.25)' : '1px solid rgba(255,255,255,0.07)',
+              }}
             >
               <span className="flex items-center gap-2">
                 <Filter size={14} />
@@ -662,14 +678,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
               </span>
               <ChevronDown size={14} className={showReciterFilter ? 'rotate-180' : ''} />
             </button>
-            
+
             {showReciterFilter && (
               <>
-                <div 
-                  className="fixed inset-0 z-40" 
+                <div
+                  className="fixed inset-0 z-40"
                   onClick={() => setShowReciterFilter(false)}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-brand-surface rounded-xl shadow-2xl z-50 max-h-60 overflow-y-auto" style={{ border: '1px solid var(--border-mid)' }}>
                   <div className="p-2 space-y-1">
                     <button
                       onClick={() => {
@@ -679,8 +695,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       className={`
                         w-full px-3 py-2 rounded-lg text-sm text-left transition-all
                         ${selectedReciterFilter === 'all'
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          ? 'bg-brand-gold text-brand-void'
+                          : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
                         }
                       `}
                     >
@@ -696,8 +712,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                         className={`
                           w-full px-3 py-2 rounded-lg text-sm text-left transition-all
                           ${selectedReciterFilter === reciter
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            ? 'bg-brand-gold text-brand-void'
+                            : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
                           }
                         `}
                       >
@@ -710,13 +726,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
             )}
           </div>
           <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: 'var(--text-faint)' }} />
             <input
               type="text"
               placeholder="Search surahs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 bg-brand-elevated rounded-xl text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+              style={{ border: '1px solid var(--border-subtle)' }}
             />
           </div>
           <div className="h-[380px] overflow-y-auto">
@@ -734,15 +751,17 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
             return (
               <div
                 key={surah.id}
-                className={`
-                  w-full rounded-2xl border-2 transition-all
-                  ${!hasAudio 
-                    ? 'bg-slate-800 border-slate-700 text-slate-500 opacity-50 cursor-not-allowed' 
-                    : isActive 
-                      ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' 
-                      : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-800 hover:border-slate-700'
-                  }
-                `}
+                className={`w-full rounded-2xl transition-all`}
+                style={{
+                  background: !hasAudio ? '#14112a' : isActive ? 'rgba(245,201,122,0.07)' : '#0e0c1a',
+                  border: !hasAudio
+                    ? '1px solid rgba(255,255,255,0.06)'
+                    : isActive
+                    ? '1px solid rgba(245,201,122,0.30)'
+                    : '1px solid rgba(255,255,255,0.07)',
+                  opacity: !hasAudio ? 0.45 : 1,
+                  cursor: !hasAudio ? 'not-allowed' : 'default',
+                }}
               >
                 <div className="flex items-center justify-between gap-3 p-4">
                 <button
@@ -753,15 +772,15 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {isActive && (
-                      <span className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest">
+                      <span className="text-[9px] font-brand-mono font-medium uppercase tracking-widest text-brand-gold" style={{ opacity: 0.7 }}>
                         • PLAYING
                       </span>
                     )}
                   </div>
-                  <div className={`
-                    font-bold text-sm
-                    ${!hasAudio ? 'text-slate-500' : isActive ? 'text-white' : 'text-white'}
-                  `}>
+                  <div
+                    className={`font-medium text-[15px] leading-snug ${isActive ? 'text-brand-text' : 'text-brand-text'}`}
+                    style={!hasAudio ? { color: 'var(--text-faint)' } : {}}
+                  >
                     {surah.name}{surah.nameArabic ? ` | ${surah.nameArabic}` : ''}
                   </div>
                   {hasAudio && selectedOption && (
@@ -772,10 +791,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                           setExpandedSurah(isExpanded ? null : surah.id);
                         }
                       }}
-                      className={`
-                        text-[10px] mt-1 flex items-center gap-1 hover:underline
-                        ${!hasAudio ? 'text-slate-600' : isActive ? 'text-indigo-200' : 'text-slate-500'}
-                      `}
+                      className="text-[11px] mt-1 flex items-center gap-1 hover:underline font-brand-mono"
+                      style={{ color: 'var(--text-faint)' }}
                       aria-label="Select reciter"
                     >
                       Reciter: {selectedOption.isClip ? (selectedOption.reciter || selectedAudioName) : selectedAudioName}
@@ -793,13 +810,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                         e.stopPropagation();
                         onReplayToggle();
                       }}
-                      className={`
-                        p-2 rounded-xl transition-all
-                        ${isReplayEnabled
-                          ? 'bg-indigo-500 hover:bg-indigo-600 text-white'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
-                        }
-                      `}
+                      className="p-2 rounded-xl transition-all"
+                      style={{
+                        background: isReplayEnabled ? 'rgba(245,201,122,0.15)' : 'rgba(255,255,255,0.06)',
+                        color: isReplayEnabled ? '#F5C97A' : 'var(--text-faint)',
+                      }}
                       aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
                     >
                       <Repeat size={16} />
@@ -817,52 +832,41 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       }
                     }}
                     disabled={!hasAudio}
-                    className={`
-                      p-2 rounded-xl transition-all
-                      ${!hasAudio 
-                        ? 'bg-slate-700 cursor-not-allowed' 
-                        : isActive 
-                          ? 'bg-white/20 hover:bg-white/30' 
-                          : 'bg-slate-800 hover:bg-slate-700'
-                      }
-                    `}
+                    className="p-2 rounded-xl transition-all"
+                    style={{
+                      background: !hasAudio ? 'transparent' : isActive ? 'rgba(245,201,122,0.15)' : 'rgba(255,255,255,0.06)',
+                      cursor: !hasAudio ? 'not-allowed' : 'pointer',
+                    }}
                     aria-label={hasAudio ? (isActive && isPlaying ? 'Pause' : 'Play') : 'No audio available'}
                   >
                     {isActive && isPlaying ? (
-                      <Pause 
-                        size={16} 
-                        className="text-white"
-                        fill="currentColor"
-                      />
+                      <Pause size={16} style={{ color: '#F5C97A' }} fill="currentColor" />
                     ) : (
-                      <Play 
-                        size={16} 
-                        className={!hasAudio ? 'text-slate-600' : isActive ? 'text-white' : 'text-slate-400'}
-                        fill={!hasAudio ? 'none' : isActive ? 'currentColor' : 'none'}
+                      <Play
+                        size={16}
+                        style={{ color: !hasAudio ? 'var(--text-faint)' : isActive ? '#F5C97A' : 'var(--text-muted)' }}
+                        fill={isActive ? 'currentColor' : 'none'}
                       />
                     )}
                   </button>
                 </div>
                 </div>
                 {isExpanded && surah.audioOptions && surah.audioOptions.length > 0 && (
-                  <div className="px-4 pb-4 border-t border-slate-700/50 mt-2">
+                  <div className="px-4 pb-4 mt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
                     <div className="pt-3 space-y-1">
-                      <div className="text-[10px] text-slate-400 mb-2 uppercase tracking-wider">Select Reciter:</div>
+                      <div className="text-[10px] font-brand-mono mb-2 uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>Select Reciter:</div>
                       {surah.audioOptions.map((option) => {
                         const reciterName = option.reciter || option.name;
                         const description = getReciterDescription(reciterName);
                         return (
                           <div
                             key={option.name}
-                            className={`
-                              w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all
-                              ${selectedAudioName === option.name
-                                ? 'bg-indigo-500 text-white'
-                                : isActive
-                                  ? 'bg-indigo-500/20 text-indigo-100 hover:bg-indigo-500/30'
-                                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                              }
-                            `}
+                            className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all"
+                            style={{
+                              background: selectedAudioName === option.name ? 'rgba(245,201,122,0.10)' : '#14112a',
+                              color: selectedAudioName === option.name ? '#F5C97A' : 'var(--text-muted)',
+                              border: selectedAudioName === option.name ? '1px solid rgba(245,201,122,0.20)' : '1px solid transparent',
+                            }}
                           >
                             <button
                               onClick={(e) => {
@@ -881,7 +885,8 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                                 e.stopPropagation();
                                 setShowReciterInfo({ reciterName, description });
                               }}
-                              className="p-1 rounded hover:bg-white/20 transition-all flex-shrink-0"
+                              className="p-1 rounded hover:bg-white/10 transition-all flex-shrink-0"
+                              style={{ color: 'var(--text-faint)' }}
                               aria-label="Reciter information"
                             >
                               <Info size={16} />

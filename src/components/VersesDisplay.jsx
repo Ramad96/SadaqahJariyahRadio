@@ -11,12 +11,12 @@ function parseRange(range) {
   if (!range) return [];
   const parts = range.split('-');
   if (parts.length !== 2) return [];
-  
+
   const start = parseInt(parts[0], 10);
   const end = parseInt(parts[1], 10);
-  
+
   if (isNaN(start) || isNaN(end) || start < 1 || end < start) return [];
-  
+
   const verses = [];
   for (let i = start; i <= end; i++) {
     verses.push(i);
@@ -55,10 +55,11 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
 
   if (!isVisible) {
     return (
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+      <div className="bg-brand-surface rounded-3xl shadow-2xl p-4" style={{ border: '1px solid var(--border-subtle)' }}>
         <button
           onClick={() => setIsVisible(true)}
-          className="w-full px-4 py-2 flex items-center justify-center gap-2 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors rounded-xl"
+          className="w-full px-4 py-2 flex items-center justify-center gap-2 hover:bg-brand-elevated transition-colors rounded-xl"
+          style={{ color: 'var(--text-muted)' }}
           aria-label="Show verses"
         >
           <ChevronUp size={18} />
@@ -69,28 +70,29 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
   }
 
   return (
-    <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl p-4">
+    <div className="bg-brand-surface rounded-3xl shadow-2xl p-4" style={{ border: '1px solid var(--border-subtle)' }}>
       {/* Header with Hide Button */}
-      <div className="border-b border-slate-700 flex items-center justify-between pb-3 mb-4">
+      <div className="flex items-center justify-between pb-3 mb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         <div className="flex-1">
-          <h2 className="text-white font-bold text-lg">
+          <h2 className="text-brand-text font-semibold text-lg">
             {currentSurah.name}
             {currentSurah.nameArabic && (
-              <span className="text-slate-400 font-normal ml-2">
+              <span className="font-arabic ml-2 text-brand-gold font-normal">
                 {currentSurah.nameArabic}
               </span>
             )}
           </h2>
-          <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+          <p className="text-sm mt-1 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
             Verses {currentAudioOption.range}
-            <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">
+            <span className="text-xs px-2 py-0.5 rounded-full font-brand-mono bg-brand-elevated" style={{ color: 'var(--text-faint)' }}>
               {scriptType === 'indopak' ? 'IndoPak' : 'Uthmani'}
             </span>
           </p>
         </div>
         <button
           onClick={() => setIsVisible(false)}
-          className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+          className="p-2 rounded-lg hover:bg-brand-elevated transition-all"
+          style={{ color: 'var(--text-muted)' }}
           aria-label="Hide verses"
         >
           <ChevronDown size={20} />
@@ -102,17 +104,17 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
           {verses.map((verse) => (
             <div key={verse.number} className="flex gap-3 items-start">
               <div className="flex-1">
-                <p className="text-white text-xl leading-relaxed font-arabic">
+                <p className="text-brand-text text-xl leading-relaxed font-arabic">
                   {verse.text}
                 </p>
                 {showTranslation && getVerseTranslation(currentSurah.number, verse.number) && (
-                  <p className="text-slate-400 text-sm leading-relaxed mt-2">
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: 'var(--text-muted)' }}>
                     {getVerseTranslation(currentSurah.number, verse.number)}
                   </p>
                 )}
               </div>
               <div className="flex-shrink-0">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-gold text-brand-void text-sm font-bold font-brand-mono">
                   {verse.number}
                 </span>
               </div>
@@ -123,4 +125,3 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
     </div>
   );
 }
-
