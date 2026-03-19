@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Radio, Repeat, Menu } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Radio, Repeat, Menu, Info, Bookmark, Users, Settings } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 
 export default function Balcony({
@@ -116,7 +116,7 @@ export default function Balcony({
           <div className="flex-shrink-0 relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text transition-all"
+              className="p-2 rounded-full transition-all active:scale-95 bg-white/10 hover:text-brand-gold text-brand-text"
               aria-label="Menu"
             >
               <Menu size={20} />
@@ -125,36 +125,26 @@ export default function Balcony({
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
                 <div
-                  className="absolute right-0 top-full mt-2 bg-brand-surface rounded-xl shadow-2xl z-50 overflow-hidden min-w-[150px]"
+                  className="absolute right-0 top-full mt-2 bg-brand-surface rounded-2xl shadow-2xl z-50 overflow-hidden min-w-[190px]"
                   style={{ border: '1px solid var(--border-mid)' }}
                 >
-                  <button
-                    onClick={() => { onMenuSelect('about'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
-                  >
-                    About Us
-                  </button>
-                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
-                  <button
-                    onClick={() => { onMenuSelect('bookmark'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
-                  >
-                    Bookmark
-                  </button>
-                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
-                  <button
-                    onClick={() => { onMenuSelect('community'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
-                  >
-                    Community
-                  </button>
-                  <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
-                  <button
-                    onClick={() => { onMenuSelect('settings'); setShowMenu(false); }}
-                    className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all"
-                  >
-                    Settings
-                  </button>
+                  {[
+                    { key: 'about', label: 'About Us', icon: Info },
+                    { key: 'bookmark', label: 'Bookmark', icon: Bookmark },
+                    { key: 'community', label: 'Community', icon: Users },
+                    { key: 'settings', label: 'Settings', icon: Settings },
+                  ].map(({ key, label, icon: Icon }, i, arr) => (
+                    <div key={key}>
+                      <button
+                        onClick={() => { onMenuSelect(key); setShowMenu(false); }}
+                        className="w-full px-4 py-3 text-left text-sm text-brand-text hover:bg-brand-elevated transition-all flex items-center gap-3 group"
+                      >
+                        <Icon size={15} className="opacity-50 group-hover:opacity-80 transition-opacity flex-shrink-0" />
+                        <span>{label}</span>
+                      </button>
+                      {i < arr.length - 1 && <div className="h-px mx-3" style={{ background: 'var(--border-subtle)' }} />}
+                    </div>
+                  ))}
                 </div>
               </>
             )}

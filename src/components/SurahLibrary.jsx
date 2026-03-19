@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter, Shuffle } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter, Shuffle, Settings } from 'lucide-react';
 import { getReciterDescription } from '../data/reciterDescriptions';
 import { getRangeDisplay } from '../utils/clipParser';
 import { getGlobalListeningStats } from '../utils/supabase';
@@ -559,53 +559,62 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
 
         {/* Settings Modal */}
         {menuSection === 'settings' && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-center relative mb-6">
-                <h2 className="text-xl font-semibold text-brand-text">Settings</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onCloseMenu}>
+            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-sm w-full" style={{ border: '1px solid var(--border-mid)' }} onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pt-5 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(245,201,122,0.12)' }}>
+                    <Settings size={14} style={{ color: 'var(--color-brand-gold, #F5C97A)' }} />
+                  </div>
+                  <h2 className="text-base font-semibold text-brand-text">Settings</h2>
+                </div>
                 <button
                   onClick={onCloseMenu}
-                  className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-brand-elevated transition-all"
                   style={{ color: 'var(--text-muted)' }}
                   aria-label="Close"
                 >
-                  <X size={20} />
+                  <X size={16} />
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <div className="p-5 space-y-5">
+                {/* Quran Script */}
                 <div>
-                  <h3 className="text-xs font-brand-mono font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>Quran Script</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => onScriptTypeChange('uthmani')}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        scriptType === 'uthmani'
-                          ? 'bg-brand-gold text-brand-void'
-                          : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
-                      }`}
-                      style={scriptType !== 'uthmani' ? { border: '1px solid var(--border-subtle)' } : {}}
-                    >
-                      <div className="font-semibold">Uthmani</div>
-                      <div className="text-xs opacity-70 mt-0.5">Madani Mushaf</div>
-                    </button>
-                    <button
-                      onClick={() => onScriptTypeChange('indopak')}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        scriptType === 'indopak'
-                          ? 'bg-brand-gold text-brand-void'
-                          : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
-                      }`}
-                      style={scriptType !== 'indopak' ? { border: '1px solid var(--border-subtle)' } : {}}
-                    >
-                      <div className="font-semibold">IndoPak</div>
-                      <div className="text-xs opacity-70 mt-0.5">Nastaleeq Style</div>
-                    </button>
+                  <p className="text-[10px] font-brand-mono font-medium uppercase mb-2.5" style={{ color: 'var(--text-faint)', letterSpacing: '1.5px' }}>Quran Script</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'uthmani', label: 'Uthmani', sub: 'Madani Mushaf' },
+                      { id: 'indopak', label: 'IndoPak', sub: 'Nastaleeq Style' },
+                    ].map(({ id, label, sub }) => {
+                      const active = scriptType === id;
+                      return (
+                        <button
+                          key={id}
+                          onClick={() => onScriptTypeChange(id)}
+                          className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                            active ? 'text-brand-void' : 'bg-brand-elevated text-brand-text hover:bg-[#1c1930]'
+                          }`}
+                          style={active
+                            ? { background: 'linear-gradient(135deg, #F5C97A 0%, #C8884A 100%)' }
+                            : { border: '1px solid var(--border-subtle)' }
+                          }
+                        >
+                          <div className="font-semibold">{label}</div>
+                          <div className={`text-xs mt-0.5 ${active ? 'opacity-60' : 'opacity-50'}`}>{sub}</div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
+                {/* Divider */}
+                <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
+
+                {/* Translation */}
                 <div>
-                  <h3 className="text-xs font-brand-mono font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>Translation</h3>
+                  <p className="text-[10px] font-brand-mono font-medium uppercase mb-2.5" style={{ color: 'var(--text-faint)', letterSpacing: '1.5px' }}>Translation</p>
                   <button
                     onClick={() => onShowTranslationChange(!showTranslation)}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-brand-elevated hover:bg-[#1c1930] transition-all"
@@ -615,8 +624,15 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       <div className="text-sm font-semibold text-brand-text">English Translation</div>
                       <div className="text-xs mt-0.5" style={{ color: 'var(--text-faint)' }}>Saheeh International</div>
                     </div>
-                    <div className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${showTranslation ? 'bg-brand-gold' : 'bg-brand-elevated'}`} style={!showTranslation ? { border: '1px solid var(--border-mid)' } : {}}>
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-brand-void shadow transition-transform ${showTranslation ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <div className={`relative w-10 h-5.5 rounded-full transition-all flex-shrink-0 ${showTranslation ? '' : ''}`}
+                      style={{
+                        background: showTranslation ? 'linear-gradient(135deg, #F5C97A 0%, #C8884A 100%)' : 'rgba(255,255,255,0.08)',
+                        border: showTranslation ? 'none' : '1px solid var(--border-mid)',
+                        width: '42px',
+                        height: '24px',
+                      }}
+                    >
+                      <span className={`absolute top-0.5 w-5 h-5 rounded-full shadow-md transition-all ${showTranslation ? 'translate-x-[18px] bg-brand-void' : 'translate-x-0.5 bg-white/40'}`} />
                     </div>
                   </button>
                 </div>
