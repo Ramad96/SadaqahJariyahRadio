@@ -1,14 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lateef:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-brand-void: #080610;
+  --color-brand-surface: #0e0c1a;
+  --color-brand-elevated: #14112a;
+  --color-brand-gold: #F5C97A;
+  --color-brand-gold-mid: #C8884A;
+  --color-brand-text: #e8e0d8;
+}
+
+:root {
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-mid: rgba(255,255,255,0.10);
+  --border-gold: rgba(245,201,122,0.25);
+  --text-muted: rgba(232,224,216,0.45);
+  --text-faint: rgba(232,224,216,0.25);
+  --gold-glow: rgba(245,201,122,0.12);
+}
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Crimson Pro', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+  background-image:
+    repeating-linear-gradient(60deg, transparent, transparent 40px, rgba(255,255,255,0.012) 40px, rgba(255,255,255,0.012) 41px),
+    repeating-linear-gradient(-60deg, transparent, transparent 40px, rgba(255,255,255,0.012) 40px, rgba(255,255,255,0.012) 41px);
 }
 
 * {
@@ -31,9 +51,13 @@ body {
 }
 
 .font-arabic {
-  font-family: 'Amiri', 'Noto Sans Arabic', serif;
+  font-family: 'Lateef', serif;
   direction: rtl;
   text-align: right;
+}
+
+.font-brand-mono {
+  font-family: 'DM Mono', monospace;
 }
 
 /* Custom scrollbar for verses display */
@@ -42,15 +66,15 @@ body {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #0e0c1a;
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #14112a;
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: rgba(245,201,122,0.25);
 }

@@ -505,7 +505,7 @@ function App() {
   })() : null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-brand-void text-brand-text">
       <Balcony
         currentSurah={currentSurah}
         currentAudioOption={currentAudioOption}
@@ -546,9 +546,9 @@ function App() {
         onShowTranslationChange={setShowTranslation}
       />
       
-      <footer className="w-full py-6 mt-8 border-t border-slate-800">
-        <div className="text-center text-slate-400 text-sm">
-          Created by <a href="https://amanahdigital.co.uk" target="_blank" rel="noopener noreferrer" className="text-slate-300 font-semibold hover:text-white transition-colors">AmanahDigital</a>
+      <footer className="w-full py-6 mt-8 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+        <div className="text-center text-sm font-brand-mono" style={{ color: 'var(--text-faint)' }}>
+          Created by <a href="https://amanahdigital.co.uk" target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:text-brand-gold-mid transition-colors font-medium">AmanahDigital</a>
         </div>
       </footer>
     </div>
