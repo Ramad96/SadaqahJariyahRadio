@@ -1,27 +1,80 @@
 @import url('https://fonts.googleapis.com/css2?family=Lateef:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --color-brand-void: #080610;
-  --color-brand-surface: #0e0c1a;
-  --color-brand-elevated: #14112a;
-  --color-brand-gold: #F5C97A;
-  --color-brand-gold-mid: #C8884A;
-  --color-brand-text: #e8e0d8;
+/* Map Tailwind utility names to dynamic CSS variables */
+@theme inline {
+  --color-brand-void: var(--bg-void);
+  --color-brand-surface: var(--bg-surface);
+  --color-brand-elevated: var(--bg-elevated);
+  --color-brand-gold: var(--gold);
+  --color-brand-gold-mid: var(--gold-mid);
+  --color-brand-text: var(--text-primary-val);
 }
 
+/* ── DARK THEME (default) ── */
 :root {
-  --border-subtle: rgba(255,255,255,0.07);
-  --border-mid: rgba(255,255,255,0.12);
-  --border-gold: rgba(245,201,122,0.22);
-  --text-muted: rgba(232,224,216,0.55);
-  --text-faint: rgba(232,224,216,0.30);
-  --gold-glow: rgba(245,201,122,0.10);
+  --bg-void:        #080610;
+  --bg-surface:     #0e0c1a;
+  --bg-elevated:    #14112a;
+  --gold:           #F5C97A;
+  --gold-mid:       #C8884A;
+  --gold-glow:      rgba(245,201,122,0.10);
+  --text-primary-val: #e8e0d8;
+  --border-subtle:  rgba(255,255,255,0.07);
+  --border-mid:     rgba(255,255,255,0.12);
+  --border-gold:    rgba(245,201,122,0.22);
+  --text-muted:     rgba(232,224,216,0.55);
+  --text-faint:     rgba(232,224,216,0.30);
+  /* Component tokens */
+  --gold-gradient:          linear-gradient(135deg, #F5C97A 0%, #C8884A 100%);
+  --btn-icon-bg:            rgba(255,255,255,0.10);
+  --btn-icon-hover:         rgba(255,255,255,0.20);
+  --inactive-bg:            rgba(255,255,255,0.04);
+  --toggle-off-bg:          rgba(255,255,255,0.08);
+  --toggle-thumb-off:       rgba(255,255,255,0.40);
+  --card-active-bg:         rgba(245,201,122,0.07);
+  --card-active-border:     rgba(245,201,122,0.30);
+  --active-btn-border:      rgba(245,201,122,0.25);
+  --replay-active-bg:       rgba(245,201,122,0.15);
+  --settings-icon-bg:       rgba(245,201,122,0.12);
+  --reciter-selected-bg:    rgba(245,201,122,0.10);
+  --reciter-selected-border: rgba(245,201,122,0.20);
+  --body-texture-color:     rgba(255,255,255,0.008);
+}
+
+/* ── LIGHT THEME ── */
+[data-theme="light"] {
+  --bg-void:        #F5F0E8;
+  --bg-surface:     #EDE7DB;
+  --bg-elevated:    #E4DDD0;
+  --gold:           #A0601A;
+  --gold-mid:       #7A4510;
+  --gold-glow:      rgba(160,96,26,0.08);
+  --text-primary-val: #1C1610;
+  --border-subtle:  rgba(28,22,16,0.09);
+  --border-mid:     rgba(28,22,16,0.15);
+  --border-gold:    rgba(160,96,26,0.28);
+  --text-muted:     rgba(28,22,16,0.55);
+  --text-faint:     rgba(28,22,16,0.32);
+  /* Component tokens */
+  --gold-gradient:          linear-gradient(135deg, #A0601A 0%, #7A4510 100%);
+  --btn-icon-bg:            rgba(28,22,16,0.08);
+  --btn-icon-hover:         rgba(28,22,16,0.14);
+  --inactive-bg:            rgba(28,22,16,0.04);
+  --toggle-off-bg:          rgba(28,22,16,0.08);
+  --toggle-thumb-off:       rgba(28,22,16,0.30);
+  --card-active-bg:         rgba(160,96,26,0.06);
+  --card-active-border:     rgba(160,96,26,0.30);
+  --active-btn-border:      rgba(160,96,26,0.30);
+  --replay-active-bg:       rgba(160,96,26,0.12);
+  --settings-icon-bg:       rgba(160,96,26,0.10);
+  --reciter-selected-bg:    rgba(160,96,26,0.08);
+  --reciter-selected-border: rgba(160,96,26,0.22);
+  --body-texture-color:     rgba(28,22,16,0.025);
 }
 
 body {
   margin: 0;
-  /* Inter for crisp screen rendering; Crimson Pro used selectively for display headings */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 15px;
   line-height: 1.6;
@@ -31,8 +84,8 @@ body {
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
   background-image:
-    repeating-linear-gradient(60deg, transparent, transparent 40px, rgba(255,255,255,0.008) 40px, rgba(255,255,255,0.008) 41px),
-    repeating-linear-gradient(-60deg, transparent, transparent 40px, rgba(255,255,255,0.008) 40px, rgba(255,255,255,0.008) 41px);
+    repeating-linear-gradient(60deg, transparent, transparent 40px, var(--body-texture-color) 40px, var(--body-texture-color) 41px),
+    repeating-linear-gradient(-60deg, transparent, transparent 40px, var(--body-texture-color) 40px, var(--body-texture-color) 41px);
 }
 
 * {
@@ -70,21 +123,30 @@ body {
   font-family: 'DM Mono', monospace;
 }
 
+/* Icon button with theme-aware hover */
+.btn-icon {
+  background: var(--btn-icon-bg);
+  transition: background 0.15s;
+}
+.btn-icon:hover {
+  background: var(--btn-icon-hover);
+}
+
 /* Custom scrollbar for verses display */
 .overflow-y-auto::-webkit-scrollbar {
   width: 6px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #0e0c1a;
+  background: var(--bg-surface);
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.08);
+  background: var(--border-mid);
   border-radius: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: rgba(245,201,122,0.20);
+  background: var(--border-gold);
 }

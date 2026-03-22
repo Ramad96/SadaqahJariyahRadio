@@ -73,7 +73,7 @@ export default function Balcony({
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
             <button
               onClick={onPrevious}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text disabled:opacity-40 transition-all active:scale-95"
+              className="p-2 rounded-full btn-icon text-brand-text disabled:opacity-40 transition-all active:scale-95"
               aria-label="Previous"
               disabled={!currentSurah}
             >
@@ -94,7 +94,7 @@ export default function Balcony({
               className={`p-2 rounded-full transition-all active:scale-95 ${
                 isReplayEnabled
                   ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
-                  : 'bg-white/10 hover:bg-white/20 text-brand-text'
+                  : 'btn-icon text-brand-text'
               } disabled:opacity-40`}
               aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
               disabled={!currentSurah}
@@ -104,7 +104,7 @@ export default function Balcony({
 
             <button
               onClick={onNext}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-brand-text disabled:opacity-40 transition-all active:scale-95"
+              className="p-2 rounded-full btn-icon text-brand-text disabled:opacity-40 transition-all active:scale-95"
               aria-label="Next"
               disabled={!currentSurah}
             >
@@ -116,7 +116,7 @@ export default function Balcony({
           <div className="flex-shrink-0 relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-full transition-all active:scale-95 bg-white/10 hover:text-brand-gold text-brand-text"
+              className="p-2 rounded-full transition-all active:scale-95 btn-icon hover:text-brand-gold text-brand-text"
               aria-label="Menu"
             >
               <Menu size={20} />

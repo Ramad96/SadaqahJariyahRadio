@@ -30,6 +30,9 @@ function App() {
   const [showTranslation, setShowTranslation] = useState(() =>
     localStorage.getItem('showTranslation') !== 'false'
   );
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('theme') || 'system'
+  );
   
   // Always use clips mode - keep list in order, randomly select one per surah
   const surahs = useMemo(() => {
@@ -101,6 +104,24 @@ function App() {
   useEffect(() => {
     localStorage.setItem('showTranslation', showTranslation.toString());
   }, [showTranslation]);
+
+  // Apply theme to document and persist preference
+  useEffect(() => {
+    const applyTheme = (pref) => {
+      const resolved = pref === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : pref;
+      document.documentElement.setAttribute('data-theme', resolved);
+    };
+    applyTheme(theme);
+    localStorage.setItem('theme', theme);
+    if (theme === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = () => applyTheme('system');
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    }
+  }, [theme]);
 
   // Track listening time when audio is playing
   useEffect(() => {
@@ -544,6 +565,8 @@ function App() {
         onScriptTypeChange={setScriptType}
         showTranslation={showTranslation}
         onShowTranslationChange={setShowTranslation}
+        theme={theme}
+        onThemeChange={setTheme}
       />
       
       <footer className="w-full py-5 mt-auto border-t" style={{ borderColor: 'var(--border-subtle)' }}>
