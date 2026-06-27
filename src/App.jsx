@@ -25,9 +25,14 @@ function App() {
     progress,
     duration,
     isReplayEnabled,
+    isShuffleEnabled,
     autoPlayNext,
     selectedAudio,
     currentAudioOption,
+    playbackSpeed,
+    volume,
+    sleepTimerMinutes,
+    sleepTimerRemaining,
     setAutoPlayNext,
     getSurahAudioUrl,
     handleFilteredSurahsChange,
@@ -36,8 +41,12 @@ function App() {
     handlePlayRandom,
     handlePlayPause,
     handleReplayToggle,
+    handleShuffleToggle,
     handleNext,
     handlePrevious,
+    handleSpeedChange,
+    handleVolumeChange,
+    handleSleepTimerSet,
   } = useAudioPlayer(surahs);
 
   useEffect(() => {
@@ -84,6 +93,8 @@ function App() {
         onMenuSelect={setMenuSection}
         isReplayEnabled={isReplayEnabled}
         onReplayToggle={handleReplayToggle}
+        isShuffleEnabled={isShuffleEnabled}
+        onShuffleToggle={handleShuffleToggle}
       />
 
       {audioError && (
@@ -117,6 +128,13 @@ function App() {
           onShowTranslationChange={setShowTranslation}
           theme={theme}
           onThemeChange={setTheme}
+          playbackSpeed={playbackSpeed}
+          onSpeedChange={handleSpeedChange}
+          volume={volume}
+          onVolumeChange={handleVolumeChange}
+          sleepTimerMinutes={sleepTimerMinutes}
+          sleepTimerRemaining={sleepTimerRemaining}
+          onSleepTimerSet={handleSleepTimerSet}
         />
       </ErrorBoundary>
 

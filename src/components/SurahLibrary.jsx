@@ -23,6 +23,8 @@ function SurahLibrary({
   isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom,
   scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange,
   theme, onThemeChange,
+  playbackSpeed, onSpeedChange, volume, onVolumeChange,
+  sleepTimerMinutes, sleepTimerRemaining, onSleepTimerSet,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
@@ -110,6 +112,13 @@ function SurahLibrary({
             onShowTranslationChange={onShowTranslationChange}
             theme={theme}
             onThemeChange={onThemeChange}
+            playbackSpeed={playbackSpeed}
+            onSpeedChange={onSpeedChange}
+            volume={volume}
+            onVolumeChange={onVolumeChange}
+            sleepTimerMinutes={sleepTimerMinutes}
+            sleepTimerRemaining={sleepTimerRemaining}
+            onSleepTimerSet={onSleepTimerSet}
           />
         )}
 

@@ -32,6 +32,7 @@ export function useAudioPlayer(surahs) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isReplayEnabled, setIsReplayEnabled] = useState(false);
+  const [isShuffleEnabled, setIsShuffleEnabled] = useState(false);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
   const [selectedAudio, setSelectedAudio] = useState(() => {
     const saved = localStorage.getItem('selectedAudio');
@@ -41,23 +42,40 @@ export function useAudioPlayer(surahs) {
     const saved = localStorage.getItem('totalListeningTime');
     return saved ? parseFloat(saved) : 0;
   });
+  const [playbackSpeed, setPlaybackSpeed] = useState(() => {
+    const saved = localStorage.getItem('playbackSpeed');
+    return saved ? parseFloat(saved) : 1;
+  });
+  const [volume, setVolume] = useState(() => {
+    const saved = localStorage.getItem('volume');
+    return saved ? parseFloat(saved) : 1;
+  });
+  const [sleepTimerMinutes, setSleepTimerMinutes] = useState(null);
+  const [sleepTimerRemaining, setSleepTimerRemaining] = useState(null);
 
   const audioRef = useRef(null);
   const surahsRef = useRef(surahs);
   const currentSurahRef = useRef(null);
   const autoPlayNextRef = useRef(false);
   const isReplayEnabledRef = useRef(false);
+  const isShuffleEnabledRef = useRef(false);
   const isPlayingRef = useRef(false);
   const selectedAudioRef = useRef(selectedAudio);
   const filteredSurahsRef = useRef([]);
   const listeningTimeIntervalRef = useRef(null);
   const lastUpdateTimeRef = useRef(null);
+  const playbackSpeedRef = useRef(playbackSpeed);
+  const volumeRef = useRef(volume);
+  const lastPosSaveRef = useRef(0);
+  const sleepTimerRef = useRef(null);
+  const sleepTimerIntervalRef = useRef(null);
 
   useEffect(() => { surahsRef.current = surahs; }, [surahs]);
   useEffect(() => { currentSurahRef.current = currentSurah; }, [currentSurah]);
   useEffect(() => { autoPlayNextRef.current = autoPlayNext; }, [autoPlayNext]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { isReplayEnabledRef.current = isReplayEnabled; }, [isReplayEnabled]);
+  useEffect(() => { isShuffleEnabledRef.current = isShuffleEnabled; }, [isShuffleEnabled]);
 
   useEffect(() => {
     selectedAudioRef.current = selectedAudio;
@@ -67,6 +85,18 @@ export function useAudioPlayer(surahs) {
   useEffect(() => {
     localStorage.setItem('totalListeningTime', totalListeningTime.toString());
   }, [totalListeningTime]);
+
+  useEffect(() => {
+    playbackSpeedRef.current = playbackSpeed;
+    if (audioRef.current) audioRef.current.playbackRate = playbackSpeed;
+    localStorage.setItem('playbackSpeed', playbackSpeed.toString());
+  }, [playbackSpeed]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+    if (audioRef.current) audioRef.current.volume = volume;
+    localStorage.setItem('volume', volume.toString());
+  }, [volume]);
 
   // Initialize a random clip selection for surahs that have no saved preference
   useEffect(() => {
@@ -159,17 +189,39 @@ export function useAudioPlayer(surahs) {
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+      audioRef.current.playbackRate = playbackSpeedRef.current;
+      audioRef.current.volume = volumeRef.current;
 
       audioRef.current.addEventListener('loadedmetadata', () => {
         setDuration(audioRef.current.duration);
         setAudioError(null);
+        // Restore saved playback position
+        const surah = currentSurahRef.current;
+        if (surah) {
+          const savedPos = parseFloat(localStorage.getItem(`pos_${surah.id}`) || '0');
+          if (savedPos > 0 && savedPos < audioRef.current.duration - 5) {
+            audioRef.current.currentTime = savedPos;
+          }
+        }
       });
 
       audioRef.current.addEventListener('timeupdate', () => {
-        setProgress(audioRef.current.currentTime);
+        const time = audioRef.current.currentTime;
+        setProgress(time);
+        // Save position every 5 seconds
+        const now = Date.now();
+        if (now - lastPosSaveRef.current > 5000 && currentSurahRef.current && time > 0) {
+          lastPosSaveRef.current = now;
+          localStorage.setItem(`pos_${currentSurahRef.current.id}`, time.toString());
+        }
       });
 
       audioRef.current.addEventListener('ended', () => {
+        // Clear saved position for completed surah
+        if (currentSurahRef.current) {
+          localStorage.removeItem(`pos_${currentSurahRef.current.id}`);
+        }
+
         if (isReplayEnabledRef.current) return;
         setIsPlaying(false);
         setProgress(0);
@@ -177,15 +229,32 @@ export function useAudioPlayer(surahs) {
 
         const currentSurahId = currentSurahRef.current.id;
         const filtered = filteredSurahsRef.current;
-        const currentSurahData = filtered.find(s => s.id === currentSurahId);
 
         // Try next clip within the same surah first
-        if (currentSurahData?.audioOptions?.length > 1) {
-          const clips = currentSurahData.audioOptions;
-          const currentClipName = selectedAudioRef.current[currentSurahId];
-          const currentClipIndex = clips.findIndex(c => c.name === currentClipName);
-          if (currentClipIndex >= 0 && currentClipIndex < clips.length - 1) {
-            setSelectedAudio(prev => ({ ...prev, [currentSurahId]: clips[currentClipIndex + 1].name }));
+        if (!isShuffleEnabledRef.current) {
+          const currentSurahData = filtered.find(s => s.id === currentSurahId);
+          if (currentSurahData?.audioOptions?.length > 1) {
+            const clips = currentSurahData.audioOptions;
+            const currentClipName = selectedAudioRef.current[currentSurahId];
+            const currentClipIndex = clips.findIndex(c => c.name === currentClipName);
+            if (currentClipIndex >= 0 && currentClipIndex < clips.length - 1) {
+              setSelectedAudio(prev => ({ ...prev, [currentSurahId]: clips[currentClipIndex + 1].name }));
+              return;
+            }
+          }
+        }
+
+        // Shuffle: pick a random surah from the pool
+        if (isShuffleEnabledRef.current) {
+          const pool = (filtered.length ? filtered : surahsRef.current).filter(s => s.audioUrl);
+          if (pool.length > 1) {
+            const others = pool.filter(s => s.id !== currentSurahId);
+            const pick = others[Math.floor(Math.random() * others.length)];
+            const full = surahsRef.current.find(s => s.id === pick.id) || pick;
+            if (pick.audioOptions?.length > 0) {
+              setSelectedAudio(prev => ({ ...prev, [pick.id]: pick.audioOptions[0].name }));
+            }
+            setCurrentSurah(full);
             return;
           }
         }
@@ -221,6 +290,8 @@ export function useAudioPlayer(surahs) {
         audioRef.current.pause();
         audioRef.current.src = '';
       }
+      if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
+      if (sleepTimerIntervalRef.current) clearInterval(sleepTimerIntervalRef.current);
     };
   }, []);
 
@@ -351,6 +422,10 @@ export function useAudioPlayer(surahs) {
     audioRef.current.loop = next;
   };
 
+  const handleShuffleToggle = () => {
+    setIsShuffleEnabled(prev => !prev);
+  };
+
   const handleNext = () => {
     if (!currentSurah) return;
     const allSurahs = surahsRef.current;
@@ -377,6 +452,54 @@ export function useAudioPlayer(surahs) {
     if (getSurahAudioUrl(allSurahs[prevIndex])) setCurrentSurah(allSurahs[prevIndex]);
   };
 
+  /** @param {number} speed */
+  const handleSpeedChange = (speed) => {
+    setPlaybackSpeed(speed);
+  };
+
+  /** @param {number} vol - 0 to 1 */
+  const handleVolumeChange = (vol) => {
+    setVolume(vol);
+  };
+
+  /** @param {number|null} minutes - null to cancel */
+  const handleSleepTimerSet = (minutes) => {
+    if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current);
+    if (sleepTimerIntervalRef.current) clearInterval(sleepTimerIntervalRef.current);
+
+    if (!minutes) {
+      setSleepTimerMinutes(null);
+      setSleepTimerRemaining(null);
+      return;
+    }
+
+    const totalSeconds = minutes * 60;
+    setSleepTimerMinutes(minutes);
+    setSleepTimerRemaining(totalSeconds);
+
+    sleepTimerIntervalRef.current = setInterval(() => {
+      setSleepTimerRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(sleepTimerIntervalRef.current);
+          sleepTimerIntervalRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    sleepTimerRef.current = setTimeout(() => {
+      if (audioRef.current) audioRef.current.pause();
+      setIsPlaying(false);
+      setSleepTimerMinutes(null);
+      setSleepTimerRemaining(null);
+      if (sleepTimerIntervalRef.current) {
+        clearInterval(sleepTimerIntervalRef.current);
+        sleepTimerIntervalRef.current = null;
+      }
+    }, totalSeconds * 1000);
+  };
+
   const currentAudioOption = currentSurah
     ? (currentSurah.audioOptions?.find(opt => opt.name === selectedAudio[currentSurah.id]) || currentSurah.audioOptions?.[0] || null)
     : null;
@@ -388,10 +511,15 @@ export function useAudioPlayer(surahs) {
     progress,
     duration,
     isReplayEnabled,
+    isShuffleEnabled,
     autoPlayNext,
     selectedAudio,
     totalListeningTime,
     currentAudioOption,
+    playbackSpeed,
+    volume,
+    sleepTimerMinutes,
+    sleepTimerRemaining,
     setAutoPlayNext,
     setSelectedAudio,
     getSurahAudioUrl,
@@ -401,7 +529,11 @@ export function useAudioPlayer(surahs) {
     handlePlayRandom,
     handlePlayPause,
     handleReplayToggle,
+    handleShuffleToggle,
     handleNext,
     handlePrevious,
+    handleSpeedChange,
+    handleVolumeChange,
+    handleSleepTimerSet,
   };
 }

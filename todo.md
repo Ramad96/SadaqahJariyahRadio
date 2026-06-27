@@ -33,11 +33,11 @@
 ## New Features
 
 ### Audio & Playback
-- [ ] Playback speed control (0.75x, 1x, 1.25x, 1.5x)
-- [ ] Sleep timer — stop playback after 15 / 30 / 60 minutes
-- [ ] Shuffle mode — random surah from the available library
-- [ ] Volume control in the UI
-- [ ] Resume from last position — remember playback position within a surah across sessions
+- [x] Playback speed control (0.75x, 1x, 1.25x, 1.5x)
+- [x] Sleep timer — stop playback after 15 / 30 / 60 minutes
+- [x] Shuffle mode — random surah from the available library
+- [x] Volume control in the UI
+- [x] Resume from last position — remember playback position within a surah across sessions
 
 ### Content Discovery
 - [ ] "Play all by reciter" — filter to one reciter and play their full library in order

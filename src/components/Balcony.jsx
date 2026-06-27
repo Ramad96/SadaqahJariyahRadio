@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Radio, Repeat, Menu, Info, Bookmark, Users, Settings } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, Menu, Info, Bookmark, Users, Settings } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 
 export default function Balcony({
@@ -14,7 +14,9 @@ export default function Balcony({
   version,
   onMenuSelect,
   isReplayEnabled,
-  onReplayToggle
+  onReplayToggle,
+  isShuffleEnabled,
+  onShuffleToggle,
 }) {
   const textRef = useRef(null);
   const containerRef = useRef(null);
@@ -27,7 +29,6 @@ export default function Balcony({
     if (currentAudioOption) {
       const reciterName = currentAudioOption.reciter || currentAudioOption.name;
       text += ` - ${reciterName}`;
-      // Add ayah range in brackets if range exists
       if (currentAudioOption.range) {
         const rangeDisplay = getRangeDisplay(currentAudioOption.range, currentSurah.totalAyahs);
         text += ` (${rangeDisplay})`;
@@ -43,6 +44,7 @@ export default function Balcony({
       setShouldScroll(textWidth > containerWidth);
     }
   }, [currentSurah, currentAudioOption]);
+
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 bg-brand-surface shadow-lg"
@@ -70,7 +72,7 @@ export default function Balcony({
           </div>
 
           {/* Center: Controls */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-1.5">
             <button
               onClick={onPrevious}
               className="p-2 rounded-full btn-icon text-brand-text disabled:opacity-40 transition-all active:scale-95"
@@ -78,6 +80,19 @@ export default function Balcony({
               disabled={!currentSurah}
             >
               <SkipBack size={18} />
+            </button>
+
+            <button
+              onClick={onShuffleToggle}
+              className={`p-2 rounded-full transition-all active:scale-95 ${
+                isShuffleEnabled
+                  ? 'bg-brand-gold text-brand-void hover:bg-brand-gold-mid'
+                  : 'btn-icon text-brand-text'
+              } disabled:opacity-40`}
+              aria-label={isShuffleEnabled ? 'Disable shuffle' : 'Enable shuffle'}
+              disabled={!currentSurah}
+            >
+              <Shuffle size={16} />
             </button>
 
             <button
@@ -99,7 +114,7 @@ export default function Balcony({
               aria-label={isReplayEnabled ? 'Disable replay' : 'Enable replay'}
               disabled={!currentSurah}
             >
-              <Repeat size={18} />
+              <Repeat size={16} />
             </button>
 
             <button
