@@ -16,14 +16,17 @@ export function parseClipFilename(filename) {
   }
   
   const [reciterName, range] = parts;
-  
-  // Split reciter name by capital letters
-  // Example: "ShiekhMagdiOsman" -> "Shiekh Magdi Osman"
-  // Handle first letter correctly
+
+  const rangeParts = range.split('-');
+  if (rangeParts.length !== 2 || isNaN(parseInt(rangeParts[0], 10)) || isNaN(parseInt(rangeParts[1], 10))) {
+    if (import.meta.env.DEV) console.warn(`[clipParser] Invalid range "${range}" in filename: ${filename}`);
+    return null;
+  }
+
   const formattedReciter = reciterName
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
-  
+
   return {
     reciter: formattedReciter,
     range: range,

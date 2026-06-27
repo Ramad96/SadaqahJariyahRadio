@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Balcony from './components/Balcony';
 import SurahLibrary from './components/SurahLibrary';
+import ErrorBoundary from './components/ErrorBoundary';
 import { surahs as baseSurahs } from './data/surahs';
 import { getClipsForSurah } from './data/audioManifest';
-import { incrementGlobalListeningTime } from './utils/supabase';
 import { version as VERSION } from '../package.json';
 
 function App() {
   const [currentSurah, setCurrentSurah] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioError, setAudioError] = useState(null);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [autoPlayNext, setAutoPlayNext] = useState(false);
@@ -20,7 +21,6 @@ function App() {
     return saved ? JSON.parse(saved) : {};
   });
   const [totalListeningTime, setTotalListeningTime] = useState(() => {
-    // Load accumulated listening time from localStorage (in seconds)
     const saved = localStorage.getItem('totalListeningTime');
     return saved ? parseFloat(saved) : 0;
   });
@@ -78,9 +78,9 @@ function App() {
   const currentSurahRef = useRef(null);
   const autoPlayNextRef = useRef(false);
   const isReplayEnabledRef = useRef(false);
+  const isPlayingRef = useRef(false);
   const listeningTimeIntervalRef = useRef(null);
   const lastUpdateTimeRef = useRef(null);
-  const accumulatedGlobalTimeRef = useRef(0); // Accumulate before sending to Supabase
   const selectedAudioRef = useRef(selectedAudio);
   const filteredSurahsRef = useRef([]);
   
@@ -126,68 +126,32 @@ function App() {
   // Track listening time when audio is playing
   useEffect(() => {
     if (isPlaying) {
-      // Start tracking time
       lastUpdateTimeRef.current = Date.now();
       listeningTimeIntervalRef.current = setInterval(() => {
         const now = Date.now();
-        const elapsed = (now - lastUpdateTimeRef.current) / 1000; // Convert to seconds
+        const elapsed = (now - lastUpdateTimeRef.current) / 1000;
         lastUpdateTimeRef.current = now;
-        
         setTotalListeningTime(prev => {
           const newTotal = prev + elapsed;
-          // Save to localStorage immediately for persistence
           localStorage.setItem('totalListeningTime', newTotal.toString());
           return newTotal;
         });
-        
-        // Accumulate for global stats (batch updates every 10 seconds to reduce API calls)
-        accumulatedGlobalTimeRef.current += elapsed;
-        if (accumulatedGlobalTimeRef.current >= 10) {
-          const timeToSend = accumulatedGlobalTimeRef.current;
-          accumulatedGlobalTimeRef.current = 0;
-          // Send to Supabase asynchronously (don't wait for response)
-          incrementGlobalListeningTime(timeToSend).catch(err => {
-            console.error('Failed to update global listening time:', err);
-            // Re-accumulate if it failed (will retry next interval)
-            accumulatedGlobalTimeRef.current += timeToSend;
-          });
-        }
-      }, 1000); // Update every second
+      }, 1000);
     } else {
-      // Stop tracking time
       if (listeningTimeIntervalRef.current) {
         clearInterval(listeningTimeIntervalRef.current);
         listeningTimeIntervalRef.current = null;
       }
-      // Save any remaining time
       if (lastUpdateTimeRef.current) {
-        const now = Date.now();
-        const elapsed = (now - lastUpdateTimeRef.current) / 1000;
+        const elapsed = (Date.now() - lastUpdateTimeRef.current) / 1000;
         if (elapsed > 0) {
           setTotalListeningTime(prev => {
             const newTotal = prev + elapsed;
             localStorage.setItem('totalListeningTime', newTotal.toString());
             return newTotal;
           });
-          
-          // Send remaining accumulated time to global stats
-          accumulatedGlobalTimeRef.current += elapsed;
-          if (accumulatedGlobalTimeRef.current > 0) {
-            const timeToSend = accumulatedGlobalTimeRef.current;
-            accumulatedGlobalTimeRef.current = 0;
-            incrementGlobalListeningTime(timeToSend).catch(err => {
-              console.error('Failed to update global listening time:', err);
-            });
-          }
         }
         lastUpdateTimeRef.current = null;
-      } else if (accumulatedGlobalTimeRef.current > 0) {
-        // Send any remaining accumulated time when stopping
-        const timeToSend = accumulatedGlobalTimeRef.current;
-        accumulatedGlobalTimeRef.current = 0;
-        incrementGlobalListeningTime(timeToSend).catch(err => {
-          console.error('Failed to update global listening time:', err);
-        });
       }
     }
 
@@ -239,6 +203,10 @@ function App() {
   }, [autoPlayNext]);
 
   useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(() => {
     isReplayEnabledRef.current = isReplayEnabled;
   }, [isReplayEnabled]);
 
@@ -248,6 +216,7 @@ function App() {
       
       audioRef.current.addEventListener('loadedmetadata', () => {
         setDuration(audioRef.current.duration);
+        setAudioError(null);
       });
       
       audioRef.current.addEventListener('timeupdate', () => {
@@ -305,6 +274,7 @@ function App() {
       
       audioRef.current.addEventListener('error', () => {
         setIsPlaying(false);
+        setAudioError('Failed to load audio — please try another reciter.');
       });
     }
 
@@ -320,6 +290,7 @@ function App() {
     if (currentSurah && audioRef.current) {
       const audioUrl = getSurahAudioUrl(currentSurah);
       if (audioUrl) {
+        setAudioError(null);
         audioRef.current.src = audioUrl;
         audioRef.current.load();
         setProgress(0);
@@ -464,7 +435,7 @@ function App() {
       switch (e.key) {
         case ' ':
           if (audioRef.current) {
-            if (isPlaying) {
+            if (isPlayingRef.current) {
               audioRef.current.pause();
               setIsPlaying(false);
             } else {
@@ -514,7 +485,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isPlaying]);
+  }, []);
 
   // Get the selected audio option for the current surah
   const currentAudioOption = currentSurah ? (() => {
@@ -542,32 +513,40 @@ function App() {
         onReplayToggle={handleReplayToggle}
       />
       
-      <SurahLibrary
-        surahs={surahs}
-        currentSurah={currentSurah}
-        onSurahSelect={handleSurahSelect}
-        onFilteredSurahsChange={handleFilteredSurahsChange}
-        autoPlayNext={autoPlayNext}
-        onAutoPlayNextChange={setAutoPlayNext}
-        isPlaying={isPlaying}
-        onPlayPause={handlePlayPause}
-        menuSection={menuSection}
-        onCloseMenu={() => setMenuSection(null)}
-        selectedAudio={selectedAudio}
-        onAudioSelect={handleAudioSelect}
-        getSurahAudioUrl={getSurahAudioUrl}
-        totalListeningTime={totalListeningTime}
-        isReplayEnabled={isReplayEnabled}
-        onReplayToggle={handleReplayToggle}
-        currentAudioOption={currentAudioOption}
-        onPlayRandom={handlePlayRandom}
-        scriptType={scriptType}
-        onScriptTypeChange={setScriptType}
-        showTranslation={showTranslation}
-        onShowTranslationChange={setShowTranslation}
-        theme={theme}
-        onThemeChange={setTheme}
-      />
+      {audioError && (
+        <div className="mx-4 mt-3 px-4 py-2 rounded-xl text-sm text-center" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
+          {audioError}
+        </div>
+      )}
+
+      <ErrorBoundary>
+        <SurahLibrary
+          surahs={surahs}
+          currentSurah={currentSurah}
+          onSurahSelect={handleSurahSelect}
+          onFilteredSurahsChange={handleFilteredSurahsChange}
+          autoPlayNext={autoPlayNext}
+          onAutoPlayNextChange={setAutoPlayNext}
+          isPlaying={isPlaying}
+          onPlayPause={handlePlayPause}
+          menuSection={menuSection}
+          onCloseMenu={() => setMenuSection(null)}
+          selectedAudio={selectedAudio}
+          onAudioSelect={handleAudioSelect}
+          getSurahAudioUrl={getSurahAudioUrl}
+          totalListeningTime={totalListeningTime}
+          isReplayEnabled={isReplayEnabled}
+          onReplayToggle={handleReplayToggle}
+          currentAudioOption={currentAudioOption}
+          onPlayRandom={handlePlayRandom}
+          scriptType={scriptType}
+          onScriptTypeChange={setScriptType}
+          showTranslation={showTranslation}
+          onShowTranslationChange={setShowTranslation}
+          theme={theme}
+          onThemeChange={setTheme}
+        />
+      </ErrorBoundary>
       
       <footer className="w-full py-5 mt-auto border-t" style={{ borderColor: 'var(--border-subtle)' }}>
         <div className="text-center">

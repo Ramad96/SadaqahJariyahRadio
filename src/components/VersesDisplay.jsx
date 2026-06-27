@@ -41,11 +41,11 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
     return null;
   }
 
-  const verseNumbers = parseRange(currentAudioOption.range);
+  const verseNumbers = parseRange(currentAudioOption?.range);
   const verses = verseNumbers
     .map(verseNum => ({
       number: verseNum,
-      text: getVerse(currentSurah.number, verseNum)
+      text: getVerse(currentSurah?.number, verseNum)
     }))
     .filter(verse => verse.text); // Only show verses that have text
 

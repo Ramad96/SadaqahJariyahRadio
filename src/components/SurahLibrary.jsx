@@ -1,9 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, Search, X, ChevronDown, Radio, Info, HelpCircle, Repeat, Filter, Shuffle, Settings } from 'lucide-react';
-import { getReciterDescription } from '../data/reciterDescriptions';
+import { Play, Pause, Search, X, ChevronDown, Radio, HelpCircle, Repeat, Filter, Shuffle, Settings } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
-import { getGlobalListeningStats } from '../utils/supabase';
 import VersesDisplay from './VersesDisplay';
+
+function normalizeArabic(text) {
+  return text
+    .replace(/[ً-ٟؐ-ؚۖ-ۜ۟-۪ۨ-ۯ]/g, '')
+    .replace(/[أإآا]/g, 'ا')
+    .replace(/[ىي]/g, 'ي')
+    .replace(/ة/g, 'ه');
+}
 
 // Format listening time in seconds to a human-readable string
 function formatListeningTime(seconds) {
@@ -37,14 +43,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
   const [aboutTab, setAboutTab] = useState('mission');
   const [communitySection, setCommunitySection] = useState('upload');
   const [contentHeight, setContentHeight] = useState(0);
-  const [showReciterInfo, setShowReciterInfo] = useState(null); // { reciterName, description }
   const [showHelp, setShowHelp] = useState(false);
-  const [globalListeningTime, setGlobalListeningTime] = useState(undefined); // undefined = loading, null = unavailable, number = seconds
   const [feedbackForm, setFeedbackForm] = useState({ subject: '', message: '' });
   const [selectedReciterFilter, setSelectedReciterFilter] = useState('all'); // 'all' or reciter name
   const [showReciterFilter, setShowReciterFilter] = useState(false);
   const uploadRef = useRef(null);
-  const statsRef = useRef(null);
   const feedbackRef = useRef(null);
   const contentContainerRef = useRef(null);
 
@@ -52,37 +55,13 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
   useEffect(() => {
     if (menuSection === 'community' && contentContainerRef.current) {
       const uploadHeight = uploadRef.current?.scrollHeight || 0;
-      const statsHeight = statsRef.current?.scrollHeight || 0;
       const feedbackHeight = feedbackRef.current?.scrollHeight || 0;
-      const maxHeight = Math.max(uploadHeight, statsHeight, feedbackHeight);
+      const maxHeight = Math.max(uploadHeight, feedbackHeight);
       if (maxHeight > 0) {
         setContentHeight(maxHeight);
       }
     }
-  }, [menuSection, totalListeningTime, feedbackForm]);
-
-  // Fetch global listening stats on component mount and periodically
-  useEffect(() => {
-    // Fetch global stats immediately
-    getGlobalListeningStats().then(stats => {
-      if (stats) {
-        setGlobalListeningTime(stats.totalSeconds);
-      } else {
-        setGlobalListeningTime(null);
-      }
-    });
-    
-    // Refresh global stats every 10 seconds
-    const interval = setInterval(() => {
-      getGlobalListeningStats().then(stats => {
-        if (stats) {
-          setGlobalListeningTime(stats.totalSeconds);
-        }
-      });
-    }, 10000); // Refresh every 10 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
+  }, [menuSection, feedbackForm]);
 
   // Extract all unique reciter names from all surahs
   const allReciters = useMemo(() => {
@@ -139,10 +118,11 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
       // Filter by search query
       if (!searchQuery.trim()) return true;
       const query = searchQuery.toLowerCase();
+      const normalizedQuery = normalizeArabic(query);
       return (
         surah.name.toLowerCase().includes(query) ||
         surah.number.toString().includes(query) ||
-        (surah.nameArabic && surah.nameArabic.includes(query))
+        (surah.nameArabic && normalizeArabic(surah.nameArabic).includes(normalizedQuery))
       );
     });
   }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
@@ -175,9 +155,9 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         {/* Help Modal */}
         {showHelp && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowHelp(false)}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-labelledby="help-modal-title" className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-brand-text">How to Use</h2>
+                <h2 id="help-modal-title" className="text-xl font-semibold text-brand-text">How to Use</h2>
                 <button
                   onClick={() => setShowHelp(false)}
                   className="p-1 rounded-lg hover:bg-brand-elevated transition-all"
@@ -219,34 +199,12 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
           </div>
         )}
         
-        {/* Reciter Info Modal */}
-        {showReciterInfo && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowReciterInfo(null)}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-brand-text">{showReciterInfo.reciterName}</h2>
-                <button
-                  onClick={() => setShowReciterInfo(null)}
-                  className="p-1 rounded-lg hover:bg-brand-elevated transition-all"
-                  style={{ color: 'var(--text-muted)' }}
-                  aria-label="Close"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                <p>{showReciterInfo.description}</p>
-              </div>
-            </div>
-          </div>
-        )}
-        
         {/* About Us Modal */}
         {menuSection === 'about' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-labelledby="about-modal-title" className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-semibold text-brand-text">About Us</h2>
+                <h2 id="about-modal-title" className="text-xl font-semibold text-brand-text">About Us</h2>
                 <button
                   onClick={onCloseMenu}
                   className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
@@ -338,9 +296,9 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         {/* Bookmark Modal */}
         {menuSection === 'bookmark' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-labelledby="bookmark-modal-title" className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-semibold text-brand-text">Bookmark</h2>
+                <h2 id="bookmark-modal-title" className="text-xl font-semibold text-brand-text">Bookmark</h2>
                 <button
                   onClick={onCloseMenu}
                   className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
@@ -367,9 +325,9 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         {/* Community Modal */}
         {menuSection === 'community' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={onCloseMenu}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-labelledby="community-modal-title" className="bg-brand-surface rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] p-6 flex flex-col" style={{ border: '1px solid var(--border-subtle)' }} onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-center relative mb-4 flex-shrink-0">
-                <h2 className="text-xl font-semibold text-brand-text">Community</h2>
+                <h2 id="community-modal-title" className="text-xl font-semibold text-brand-text">Community</h2>
                 <button
                   onClick={onCloseMenu}
                   className="absolute right-0 p-1 rounded-lg hover:bg-brand-elevated transition-all"
@@ -392,17 +350,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   style={{ color: communitySection === 'upload' ? undefined : 'var(--text-muted)' }}
                 >
                   Upload
-                </button>
-                <button
-                  onClick={() => setCommunitySection('stats')}
-                  className={`flex-1 py-2 px-3 text-sm font-medium transition-all ${
-                    communitySection === 'stats'
-                      ? 'text-brand-text border-b-2 border-brand-gold'
-                      : 'hover:text-brand-text'
-                  }`}
-                  style={{ color: communitySection === 'stats' ? undefined : 'var(--text-muted)' }}
-                >
-                  Stats
                 </button>
                 <button
                   onClick={() => setCommunitySection('feedback')}
@@ -430,24 +377,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   </p>
                 </div>
 
-                <div ref={statsRef} className="absolute opacity-0 pointer-events-none invisible">
-                  <div>
-                    <h3 className="text-brand-text font-semibold mb-3">Listening Statistics</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="mb-1"><span className="font-semibold text-brand-text">Your Listening Time:</span></p>
-                        <p>{formatListeningTime(totalListeningTime)}</p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Your personal listening time (saved locally)</p>
-                      </div>
-                      <div className="pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                        <p className="mb-1"><span className="font-semibold text-brand-text">Global Listening Time:</span></p>
-                        <p>{formatListeningTime(0)}</p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Combined listening time from all users worldwide</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <div ref={feedbackRef} className="absolute opacity-0 pointer-events-none invisible">
                   <div>
                     <h3 className="text-brand-text font-semibold mb-3">Feedback</h3>
@@ -471,32 +400,6 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                   <p>
                     If you have a recording of a person who has passed away and would like to include it on this website please contact <span className="font-bold text-brand-text">amanahdigital1447@gmail.com</span>
                   </p>
-                )}
-
-                {communitySection === 'stats' && (
-                  <div>
-                    <h3 className="text-brand-text font-semibold mb-3">Listening Statistics</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="mb-1"><span className="font-semibold text-brand-text">Your Listening Time:</span></p>
-                        <p>{formatListeningTime(totalListeningTime)}</p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Your personal listening time (saved locally)</p>
-                      </div>
-                      <div className="pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                        <p className="mb-1"><span className="font-semibold text-brand-text">Global Listening Time:</span></p>
-                        {globalListeningTime === undefined ? (
-                          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>Loading...</p>
-                        ) : globalListeningTime === null ? (
-                          <p className="text-sm" style={{ color: 'var(--text-faint)' }}>Not available</p>
-                        ) : (
-                          <>
-                            <p>{formatListeningTime(globalListeningTime)}</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--text-faint)' }}>Combined listening time from all users worldwide</p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 )}
 
                 {communitySection === 'feedback' && (
@@ -560,14 +463,14 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
         {/* Settings Modal */}
         {menuSection === 'settings' && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onCloseMenu}>
-            <div className="bg-brand-surface rounded-3xl shadow-2xl max-w-sm w-full" style={{ border: '1px solid var(--border-mid)' }} onClick={(e) => e.stopPropagation()}>
+            <div role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" className="bg-brand-surface rounded-3xl shadow-2xl max-w-sm w-full" style={{ border: '1px solid var(--border-mid)' }} onClick={(e) => e.stopPropagation()}>
               {/* Header */}
               <div className="flex items-center justify-between px-6 pt-5 pb-4" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <div className="flex items-center gap-2.5">
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--settings-icon-bg)' }}>
                     <Settings size={14} style={{ color: 'var(--gold)' }} />
                   </div>
-                  <h2 className="text-base font-semibold text-brand-text">Settings</h2>
+                  <h2 id="settings-modal-title" className="text-base font-semibold text-brand-text">Settings</h2>
                 </div>
                 <button
                   onClick={onCloseMenu}
@@ -910,41 +813,25 @@ export default function SurahLibrary({ surahs, currentSurah, onSurahSelect, onFi
                       <div className="text-[10px] font-brand-mono mb-2 uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>Select Reciter:</div>
                       {surah.audioOptions.map((option) => {
                         const reciterName = option.reciter || option.name;
-                        const description = getReciterDescription(reciterName);
                         return (
-                          <div
+                          <button
                             key={option.name}
-                            className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onAudioSelect(surah.id, option.name);
+                              setExpandedSurah(null);
+                              onSurahSelect(surah);
+                            }}
+                            className="w-full text-left px-3 py-2 rounded-lg text-sm transition-all"
                             style={{
                               background: selectedAudioName === option.name ? 'var(--reciter-selected-bg)' : 'var(--bg-elevated)',
                               color: selectedAudioName === option.name ? 'var(--gold)' : 'var(--text-muted)',
                               border: selectedAudioName === option.name ? '1px solid var(--reciter-selected-border)' : '1px solid transparent',
                             }}
                           >
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onAudioSelect(surah.id, option.name);
-                                setExpandedSurah(null);
-                                onSurahSelect(surah);
-                              }}
-                              className="flex-1 text-left"
-                            >
-                              {reciterName}
-                              {option.range && ` (${getRangeDisplay(option.range, surah.totalAyahs)})`}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setShowReciterInfo({ reciterName, description });
-                              }}
-                              className="p-1 rounded btn-icon transition-all flex-shrink-0"
-                              style={{ color: 'var(--text-faint)' }}
-                              aria-label="Reciter information"
-                            >
-                              <Info size={16} />
-                            </button>
-                          </div>
+                            {reciterName}
+                            {option.range && ` (${getRangeDisplay(option.range, surah.totalAyahs)})`}
+                          </button>
                         );
                       })}
                     </div>
