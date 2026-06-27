@@ -23,10 +23,10 @@
 
 ## Architecture Improvements
 
-- [ ] **Extract audio engine from App.jsx** (~591 lines) — move audio logic into a `useAudioPlayer` custom hook to separate concerns and make it independently testable.
-- [ ] **Split SurahLibrary.jsx** (~971 lines) — extract each modal (About, Community, Help, Reciter Info) into its own component file.
-- [ ] **PWA service worker** — icons and install prompt exist but no service worker. Add one to enable offline audio caching.
-- [ ] **TypeScript migration** — the project has TS configured but unused. Even adding JSDoc types to key files would catch null safety issues at author time.
+- [x] **Extract audio engine from App.jsx** — all playback state, refs, effects, and handlers moved into `src/hooks/useAudioPlayer.js`. App.jsx is now a thin layout shell (~90 lines).
+- [x] **Split SurahLibrary.jsx** — all 5 modals extracted into `src/components/modals/` (HelpModal, AboutModal, BookmarkModal, CommunityModal, SettingsModal). Each modal owns its own state and refs.
+- [x] **PWA service worker** — `public/sw.js` created with cache-first for audio files and network-first for the app shell. Registered in `main.jsx` on page load.
+- [x] **JSDoc types** — `@typedef` blocks added to `useAudioPlayer.js` for `Surah` and `AudioOption`; key public functions annotated.
 
 ---
 
