@@ -87,7 +87,7 @@ function SurahLibrary({
   }, [filteredSurahs, onFilteredSurahsChange]);
 
   return (
-    <main className="pt-[38px] pb-4 px-4 flex-1 bg-brand-void">
+    <main className="pt-20 pb-4 px-4 flex-1 bg-brand-void">
       <div className="max-w-md mx-auto space-y-4">
 
         {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
@@ -107,7 +107,7 @@ function SurahLibrary({
         )}
 
         {/* Title */}
-        <div className="text-center pt-0 pb-0 px-4">
+        <div className="text-center py-4 px-4">
           <h1 className="font-display text-2xl font-semibold text-brand-gold italic tracking-tight mb-0.5 flex items-center justify-center gap-2">
             Sadaqah Jariyah Radio <Radio size={22} className="text-brand-gold" style={{ opacity: 0.7 }} />
           </h1>
@@ -124,7 +124,7 @@ function SurahLibrary({
           </p>
         </div>
 
-        <div className="bg-brand-surface rounded-3xl shadow-2xl !mt-2" style={{ border: '1px solid var(--border-subtle)' }}>
+        <div className="bg-brand-surface rounded-3xl shadow-2xl" style={{ border: '1px solid var(--border-subtle)' }}>
           <div className="p-4">
             {/* Play Random */}
             <button
@@ -469,14 +469,12 @@ function SurahLibrary({
           </div>
         </div>
 
-        <div className="!mt-2">
-          <VersesDisplay
-            currentSurah={currentSurah}
-            currentAudioOption={currentAudioOption}
-            scriptType={scriptType}
-            showTranslation={showTranslation}
-          />
-        </div>
+        <VersesDisplay
+          currentSurah={currentSurah}
+          currentAudioOption={currentAudioOption}
+          scriptType={scriptType}
+          showTranslation={showTranslation}
+        />
       </div>
     </main>
   );
