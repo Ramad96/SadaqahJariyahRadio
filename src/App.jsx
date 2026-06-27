@@ -138,7 +138,7 @@ function App() {
         />
       </ErrorBoundary>
 
-      <footer className="w-full py-5 mt-auto border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+      <footer className="w-full py-5 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
         <div className="text-center">
           <span className="text-xs font-brand-mono block mb-1" style={{ color: 'var(--text-faint)', letterSpacing: '2px' }}>POWERED BY</span>
           <a
