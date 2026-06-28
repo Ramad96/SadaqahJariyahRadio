@@ -11,7 +11,7 @@ import { X, Settings } from 'lucide-react';
  *   onThemeChange: (theme: string) => void,
  * }} props
  */
-export default function SettingsModal({ onClose, scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange, theme, onThemeChange }) {
+export default function SettingsModal({ onClose, scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange, theme, onThemeChange, arabicFontSize, onArabicFontSizeChange }) {
   const scriptOptions = [
     { id: 'uthmani', label: 'Uthmani', sub: 'Madani Mushaf' },
     { id: 'indopak', label: 'IndoPak', sub: 'Nastaleeq Style' },
@@ -50,7 +50,7 @@ export default function SettingsModal({ onClose, scriptType, onScriptTypeChange,
           </button>
         </div>
 
-        <div className="p-5 space-y-5">
+        <div className="p-5 space-y-5 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 70px)' }}>
           {/* Quran Script */}
           <div>
             <p className="text-[10px] font-brand-mono font-medium uppercase mb-2.5" style={{ color: 'var(--text-faint)', letterSpacing: '1.5px' }}>Quran Script</p>
@@ -93,6 +93,38 @@ export default function SettingsModal({ onClose, scriptType, onScriptTypeChange,
                 );
               })}
             </div>
+          </div>
+
+          <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
+
+          {/* Arabic Font Size */}
+          <div>
+            <p className="text-[10px] font-brand-mono font-medium uppercase mb-2.5" style={{ color: 'var(--text-faint)', letterSpacing: '1.5px' }}>Arabic Font Size</p>
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              {[
+                { size: 1, label: 'S' },
+                { size: 1.25, label: 'M' },
+                { size: 1.5, label: 'L' },
+                { size: 2, label: 'XL' },
+              ].map(({ size, label }) => {
+                const active = arabicFontSize === size;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => onArabicFontSizeChange(size)}
+                    className={`py-2.5 rounded-xl text-sm font-semibold transition-all ${active ? 'text-brand-void' : 'text-brand-text'}`}
+                    style={active
+                      ? { background: 'var(--gold-gradient)' }
+                      : { background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="font-arabic text-right pr-1" style={{ fontSize: arabicFontSize + 'rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              بِسْمِ اللَّهِ
+            </p>
           </div>
 
           <div className="h-px" style={{ background: 'var(--border-subtle)' }} />

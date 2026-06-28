@@ -24,7 +24,7 @@ function parseRange(range) {
   return verses;
 }
 
-export default function VersesDisplay({ currentSurah, currentAudioOption, scriptType = 'uthmani', showTranslation = true }) {
+export default function VersesDisplay({ currentSurah, currentAudioOption, scriptType = 'uthmani', showTranslation = true, arabicFontSize = 1.25 }) {
   const getVerse = scriptType === 'indopak' ? getVerseIndopak : getVerseUthmani;
   const [isVisible, setIsVisible] = useState(() => {
     // Load saved visibility state from localStorage, default to true
@@ -104,7 +104,7 @@ export default function VersesDisplay({ currentSurah, currentAudioOption, script
           {verses.map((verse) => (
             <div key={verse.number} className="flex gap-3 items-start">
               <div className="flex-1">
-                <p className="text-brand-text text-xl leading-relaxed font-arabic">
+                <p className="text-brand-text leading-relaxed font-arabic" style={{ fontSize: arabicFontSize + 'rem' }}>
                   {verse.text}
                 </p>
                 {showTranslation && getVerseTranslation(currentSurah.number, verse.number) && (

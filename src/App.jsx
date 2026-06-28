@@ -12,6 +12,7 @@ function App() {
   const [scriptType, setScriptType] = useState(() => localStorage.getItem('scriptType') || 'uthmani');
   const [showTranslation, setShowTranslation] = useState(() => localStorage.getItem('showTranslation') !== 'false');
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+  const [arabicFontSize, setArabicFontSize] = useState(() => parseFloat(localStorage.getItem('arabicFontSize') || '1.25'));
 
   const surahs = useMemo(() => baseSurahs.map(surah => {
     const clips = getClipsForSurah(surah.number, surah.folderName);
@@ -50,9 +51,49 @@ function App() {
     handleSleepTimerSet,
   } = useAudioPlayer(surahs);
 
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
+
   useEffect(() => {
     document.title = `Sadaqah Jariyah Radio Station v${VERSION}`;
   }, []);
+
+  // Online/offline detection
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
+  // Deep-link: read ?surah=N&reciter=R on first load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const surahParam = params.get('surah');
+    if (!surahParam) return;
+    const surahId = parseInt(surahParam, 10);
+    const surah = surahs.find(s => s.id === surahId);
+    if (!surah?.audioOptions?.length) return;
+    const reciterParam = params.get('reciter');
+    const option = reciterParam
+      ? surah.audioOptions.find(o => o.reciter === reciterParam) || surah.audioOptions[0]
+      : surah.audioOptions[0];
+    handleAudioSelect(surah.id, option.name);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Deep-link: update URL when the playing surah/audio changes
+  useEffect(() => {
+    if (!currentSurah) return;
+    const option = currentSurah.audioOptions?.find(o => o.name === selectedAudio[currentSurah.id]) || currentSurah.audioOptions?.[0];
+    const params = new URLSearchParams();
+    params.set('surah', currentSurah.id);
+    if (option?.reciter) params.set('reciter', option.reciter);
+    history.replaceState(null, '', '?' + params.toString());
+  }, [currentSurah, selectedAudio]);
 
   useEffect(() => {
     localStorage.setItem('scriptType', scriptType);
@@ -61,6 +102,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem('showTranslation', showTranslation.toString());
   }, [showTranslation]);
+
+  useEffect(() => {
+    localStorage.setItem('arabicFontSize', arabicFontSize.toString());
+  }, [arabicFontSize]);
 
   useEffect(() => {
     const applyTheme = (pref) => {
@@ -98,6 +143,12 @@ function App() {
         onShuffleToggle={handleShuffleToggle}
       />
 
+      {!isOnline && (
+        <div className="mx-4 mt-3 px-4 py-2 rounded-xl text-sm text-center" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
+          You're offline — only previously played audio is available
+        </div>
+      )}
+
       {audioError && (
         <div className="mx-4 mt-3 px-4 py-2 rounded-xl text-sm text-center" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
           {audioError}
@@ -129,6 +180,8 @@ function App() {
           onShowTranslationChange={setShowTranslation}
           theme={theme}
           onThemeChange={setTheme}
+          arabicFontSize={arabicFontSize}
+          onArabicFontSizeChange={setArabicFontSize}
           playbackSpeed={playbackSpeed}
           onSpeedChange={handleSpeedChange}
           volume={volume}
@@ -137,6 +190,7 @@ function App() {
           sleepTimerRemaining={sleepTimerRemaining}
           onSleepTimerSet={handleSleepTimerSet}
           recentlyPlayed={recentlyPlayed}
+          isOnline={isOnline}
         />
       </ErrorBoundary>
 

@@ -48,12 +48,12 @@
 - [ ] Word-by-word translation — tap/hover an Arabic word to see its meaning (Quran.com API supports this)
 - [ ] Transliteration — romanized pronunciation for non-Arabic readers
 - [ ] Verse highlighting sync — highlight the currently playing verse as audio progresses (requires per-verse timestamps)
-- [ ] Font size slider for Arabic text
+- [x] Font size slider for Arabic text
 
 ### Community & Sharing
-- [ ] Deep-link sharing — `/?surah=1&reciter=X` URL so users can share what they're listening to
+- [x] Deep-link sharing — `/?surah=1&reciter=X` URL so users can share what they're listening to
 - [ ] Dua / Islamic calendar widget
-- [ ] Offline mode (PWA) — cache audio files for offline listening
+- [x] Offline mode (PWA) — cache audio files for offline listening
 
 ### Stats & Motivation
 - [ ] Personal listening history — which surahs listened to and how many times

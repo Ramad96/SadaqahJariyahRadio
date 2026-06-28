@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Play, Pause, Search, ChevronDown, Radio, HelpCircle, Repeat, Filter, Shuffle, Gauge } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Play, Pause, Search, ChevronDown, Radio, HelpCircle, Repeat, Filter, Shuffle, Gauge, Link } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
 import VersesDisplay from './VersesDisplay';
 import HelpModal from './modals/HelpModal';
@@ -29,9 +29,10 @@ function SurahLibrary({
   isReplayEnabled, onReplayToggle, currentAudioOption, onPlayRandom,
   scriptType, onScriptTypeChange, showTranslation, onShowTranslationChange,
   theme, onThemeChange,
+  arabicFontSize, onArabicFontSizeChange,
   playbackSpeed, onSpeedChange, volume, onVolumeChange,
   sleepTimerMinutes, sleepTimerRemaining, onSleepTimerSet,
-  recentlyPlayed,
+  recentlyPlayed, isOnline,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
@@ -41,7 +42,18 @@ function SurahLibrary({
   const [showReciterFilter, setShowReciterFilter] = useState(false);
   const [showPlaybackControls, setShowPlaybackControls] = useState(false);
   const [showRecentlyPlayed, setShowRecentlyPlayed] = useState(false);
+  const [copiedSurahId, setCopiedSurahId] = useState(null);
   const reciterFilterRef = useRef(null);
+
+  const handleCopyLink = useCallback((surah, option) => {
+    const params = new URLSearchParams({ surah: surah.id });
+    if (option?.reciter) params.set('reciter', option.reciter);
+    const url = window.location.origin + window.location.pathname + '?' + params.toString();
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedSurahId(surah.id);
+      setTimeout(() => setCopiedSurahId(null), 2000);
+    });
+  }, []);
 
   const recentlyPlayedSurahs = useMemo(() => {
     if (!recentlyPlayed?.length) return [];
@@ -112,6 +124,8 @@ function SurahLibrary({
             onShowTranslationChange={onShowTranslationChange}
             theme={theme}
             onThemeChange={onThemeChange}
+            arabicFontSize={arabicFontSize}
+            onArabicFontSizeChange={onArabicFontSizeChange}
           />
         )}
 
@@ -477,6 +491,20 @@ function SurahLibrary({
                         <div className="flex-shrink-0 flex items-center gap-2">
                           {isActive && (
                             <button
+                              onClick={(e) => { e.stopPropagation(); handleCopyLink(surah, selectedOption); }}
+                              className="p-2 rounded-xl transition-all"
+                              style={{
+                                background: copiedSurahId === surah.id ? 'var(--replay-active-bg)' : 'var(--btn-icon-bg)',
+                                color: copiedSurahId === surah.id ? 'var(--gold)' : 'var(--text-faint)',
+                              }}
+                              aria-label="Copy share link"
+                              title="Copy link"
+                            >
+                              <Link size={14} />
+                            </button>
+                          )}
+                          {isActive && (
+                            <button
                               onClick={(e) => { e.stopPropagation(); onReplayToggle(); }}
                               className="p-2 rounded-xl transition-all"
                               style={{
@@ -560,6 +588,7 @@ function SurahLibrary({
           currentAudioOption={currentAudioOption}
           scriptType={scriptType}
           showTranslation={showTranslation}
+          arabicFontSize={arabicFontSize}
         />
       </div>
     </main>

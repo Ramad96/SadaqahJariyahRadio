@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'sjr-shell-v1';
+const SHELL_CACHE = 'sjr-shell-v2';
 const AUDIO_CACHE = 'sjr-audio-v1';
 
 // Activate immediately and take control of all clients
@@ -29,9 +29,13 @@ self.addEventListener('fetch', (event) => {
       caches.open(AUDIO_CACHE).then(async (cache) => {
         const cached = await cache.match(request);
         if (cached) return cached;
-        const response = await fetch(request);
-        if (response.ok) cache.put(request, response.clone());
-        return response;
+        try {
+          const response = await fetch(request);
+          if (response.ok) cache.put(request, response.clone());
+          return response;
+        } catch {
+          return new Response('Audio not available offline', { status: 503, statusText: 'Offline' });
+        }
       })
     );
     return;

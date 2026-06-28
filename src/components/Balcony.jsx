@@ -131,7 +131,7 @@ export default function Balcony({
           <div className="flex-shrink-0 relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 rounded-full transition-all active:scale-95 btn-icon hover:text-brand-gold text-brand-text"
+              className="p-2 rounded-lg transition-all active:scale-95 hover:text-brand-gold text-brand-text"
               aria-label="Menu"
             >
               <Menu size={20} />
