@@ -40,9 +40,9 @@
 - [x] Resume from last position — remember playback position within a surah across sessions
 
 ### Content Discovery
-- [ ] "Play all by reciter" — filter to one reciter and play their full library in order
-- [ ] Recently played list
-- [ ] Surah info panel — revelation type (Meccan/Medinan), ayah count, theme summary
+- [x] "Play all by reciter" — filter to one reciter and play their full library in order
+- [x] Recently played list
+- [x] Surah info panel — revelation type (Meccan/Medinan), ayah count, theme summary
 
 ### Text & Learning
 - [ ] Word-by-word translation — tap/hover an Arabic word to see its meaning (Quran.com API supports this)

@@ -52,6 +52,10 @@ export function useAudioPlayer(surahs) {
   });
   const [sleepTimerMinutes, setSleepTimerMinutes] = useState(null);
   const [sleepTimerRemaining, setSleepTimerRemaining] = useState(null);
+  const [recentlyPlayed, setRecentlyPlayed] = useState(() => {
+    const saved = localStorage.getItem('recentlyPlayed');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const audioRef = useRef(null);
   const surahsRef = useRef(surahs);
@@ -71,7 +75,17 @@ export function useAudioPlayer(surahs) {
   const sleepTimerIntervalRef = useRef(null);
 
   useEffect(() => { surahsRef.current = surahs; }, [surahs]);
-  useEffect(() => { currentSurahRef.current = currentSurah; }, [currentSurah]);
+  useEffect(() => {
+    currentSurahRef.current = currentSurah;
+    if (currentSurah) {
+      setRecentlyPlayed(prev => {
+        const filtered = prev.filter(id => id !== currentSurah.id);
+        const next = [currentSurah.id, ...filtered].slice(0, 10);
+        localStorage.setItem('recentlyPlayed', JSON.stringify(next));
+        return next;
+      });
+    }
+  }, [currentSurah]);
   useEffect(() => { autoPlayNextRef.current = autoPlayNext; }, [autoPlayNext]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   useEffect(() => { isReplayEnabledRef.current = isReplayEnabled; }, [isReplayEnabled]);
@@ -520,6 +534,7 @@ export function useAudioPlayer(surahs) {
     volume,
     sleepTimerMinutes,
     sleepTimerRemaining,
+    recentlyPlayed,
     setAutoPlayNext,
     setSelectedAudio,
     getSurahAudioUrl,

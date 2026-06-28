@@ -31,6 +31,22 @@ const surahNamesArabic = [
   'المسد', 'الإخلاص', 'الفلق', 'الناس'
 ];
 
+// Revelation type: 'M' = Meccan, 'D' = Medinan
+const surahRevelationTypes = [
+  'M', 'D', 'D', 'D', 'D', 'M', 'M', 'D', 'D', 'M',
+  'M', 'M', 'D', 'M', 'M', 'M', 'M', 'M', 'M', 'M',
+  'M', 'D', 'M', 'D', 'M', 'M', 'M', 'M', 'M', 'M',
+  'M', 'M', 'D', 'M', 'M', 'M', 'M', 'M', 'M', 'M',
+  'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'D', 'M',
+  'M', 'M', 'M', 'M', 'D', 'M', 'D', 'D', 'D', 'D',
+  'D', 'D', 'D', 'D', 'D', 'D', 'M', 'M', 'M', 'M',
+  'M', 'M', 'M', 'M', 'M', 'D', 'M', 'M', 'M', 'M',
+  'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M',
+  'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D', 'D', 'M',
+  'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'D',
+  'M', 'M', 'M', 'M',
+];
+
 // Number of ayahs (verses) for each surah
 const surahAyahCounts = [
   7, 286, 200, 176, 120, 165, 206, 75, 129, 109,
@@ -60,6 +76,7 @@ export const surahs = Array.from({ length: 114 }, (_, i) => {
     nameArabic: surahNameArabic,
     folderName: folderName,
     totalAyahs: surahAyahCounts[surahNumber - 1],
+    revelationType: surahRevelationTypes[i] === 'M' ? 'Meccan' : 'Medinan',
     additionalClips: []
   };
 });

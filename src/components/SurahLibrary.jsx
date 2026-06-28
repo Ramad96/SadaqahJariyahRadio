@@ -31,6 +31,7 @@ function SurahLibrary({
   theme, onThemeChange,
   playbackSpeed, onSpeedChange, volume, onVolumeChange,
   sleepTimerMinutes, sleepTimerRemaining, onSleepTimerSet,
+  recentlyPlayed,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnlyWithAudio, setShowOnlyWithAudio] = useState(true);
@@ -39,7 +40,15 @@ function SurahLibrary({
   const [selectedReciterFilter, setSelectedReciterFilter] = useState('all');
   const [showReciterFilter, setShowReciterFilter] = useState(false);
   const [showPlaybackControls, setShowPlaybackControls] = useState(false);
+  const [showRecentlyPlayed, setShowRecentlyPlayed] = useState(false);
   const reciterFilterRef = useRef(null);
+
+  const recentlyPlayedSurahs = useMemo(() => {
+    if (!recentlyPlayed?.length) return [];
+    return recentlyPlayed
+      .map(id => surahs.find(s => s.id === id))
+      .filter(Boolean);
+  }, [recentlyPlayed, surahs]);
 
   const allReciters = useMemo(() => {
     const reciterSet = new Set();
@@ -316,6 +325,23 @@ function SurahLibrary({
               )}
             </div>
 
+            {selectedReciterFilter !== 'all' && filteredSurahs.length > 0 && (
+              <button
+                onClick={() => {
+                  const first = filteredSurahs[0];
+                  const option = first?.audioOptions?.[0];
+                  if (!first || !option) return;
+                  onAutoPlayNextChange(true);
+                  onAudioSelect(first.id, option.name);
+                }}
+                className="w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 mb-3 active:scale-[0.97]"
+                style={{ background: 'var(--gold-glow)', color: 'var(--gold)', border: '1px solid var(--active-btn-border)' }}
+              >
+                <Play size={14} fill="currentColor" />
+                Play All by {selectedReciterFilter}
+              </button>
+            )}
+
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: 'var(--text-faint)' }} />
               <input
@@ -327,6 +353,49 @@ function SurahLibrary({
                 style={{ border: '1px solid var(--border-subtle)' }}
               />
             </div>
+
+            {recentlyPlayedSurahs.length > 0 && (
+              <div className="mb-3">
+                <button
+                  onClick={() => setShowRecentlyPlayed(prev => !prev)}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-brand-mono font-medium transition-all mb-1"
+                  style={{
+                    background: 'var(--inactive-bg)',
+                    color: 'var(--text-muted)',
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <span>Recently Played</span>
+                  <ChevronDown size={13} style={{ transition: 'transform 0.2s', transform: showRecentlyPlayed ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                </button>
+                {showRecentlyPlayed && (
+                  <div className="flex gap-2 overflow-x-auto pb-1 px-1" style={{ scrollbarWidth: 'none' }}>
+                    {recentlyPlayedSurahs.map(surah => {
+                      const isActive = currentSurah?.id === surah.id;
+                      return (
+                        <button
+                          key={surah.id}
+                          onClick={() => onSurahSelect(surah)}
+                          className="flex-shrink-0 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left"
+                          style={{
+                            background: isActive ? 'var(--card-active-bg)' : 'var(--bg-elevated)',
+                            color: isActive ? 'var(--gold)' : 'var(--text-muted)',
+                            border: isActive ? '1px solid var(--card-active-border)' : '1px solid var(--border-subtle)',
+                            minWidth: '90px',
+                            maxWidth: '120px',
+                          }}
+                        >
+                          <div className="truncate font-semibold">{surah.name.split('. ')[1] || surah.name}</div>
+                          <div className="text-[10px] mt-0.5" style={{ color: isActive ? 'var(--gold)' : 'var(--text-faint)', opacity: 0.8 }}>
+                            {surah.revelationType}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="h-[440px] overflow-y-auto">
               <div className="space-y-2">
@@ -386,6 +455,23 @@ function SurahLibrary({
                               )}
                             </button>
                           )}
+                          <div className="flex items-center gap-1.5 mt-1.5">
+                            {surah.revelationType && (
+                              <span
+                                className="text-[9px] font-brand-mono uppercase tracking-wider px-1.5 py-0.5 rounded"
+                                style={{
+                                  background: surah.revelationType === 'Meccan' ? 'rgba(180,140,60,0.12)' : 'rgba(80,140,200,0.12)',
+                                  color: surah.revelationType === 'Meccan' ? 'var(--gold)' : 'var(--text-faint)',
+                                  opacity: 0.85,
+                                }}
+                              >
+                                {surah.revelationType}
+                              </span>
+                            )}
+                            <span className="text-[9px] font-brand-mono" style={{ color: 'var(--text-faint)', opacity: 0.6 }}>
+                              {surah.totalAyahs} ayahs
+                            </span>
+                          </div>
                         </button>
 
                         <div className="flex-shrink-0 flex items-center gap-2">

@@ -33,6 +33,7 @@ function App() {
     volume,
     sleepTimerMinutes,
     sleepTimerRemaining,
+    recentlyPlayed,
     setAutoPlayNext,
     getSurahAudioUrl,
     handleFilteredSurahsChange,
@@ -135,6 +136,7 @@ function App() {
           sleepTimerMinutes={sleepTimerMinutes}
           sleepTimerRemaining={sleepTimerRemaining}
           onSleepTimerSet={handleSleepTimerSet}
+          recentlyPlayed={recentlyPlayed}
         />
       </ErrorBoundary>
 
