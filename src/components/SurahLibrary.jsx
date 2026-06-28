@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Play, Pause, Search, ChevronDown, Radio, HelpCircle, Repeat, Filter, Shuffle, Gauge, Link } from 'lucide-react';
+import { Play, Pause, Search, ChevronDown, Radio, HelpCircle, Repeat, Filter, Shuffle, Gauge, Link, Download, Check, WifiOff } from 'lucide-react';
 import { getRangeDisplay } from '../utils/clipParser';
+import { useOfflineAudio } from '../hooks/useOfflineAudio';
 import VersesDisplay from './VersesDisplay';
 import HelpModal from './modals/HelpModal';
 import AboutModal from './modals/AboutModal';
@@ -42,8 +43,10 @@ function SurahLibrary({
   const [showReciterFilter, setShowReciterFilter] = useState(false);
   const [showPlaybackControls, setShowPlaybackControls] = useState(false);
   const [showRecentlyPlayed, setShowRecentlyPlayed] = useState(false);
+  const [showOfflineOnly, setShowOfflineOnly] = useState(false);
   const [copiedSurahId, setCopiedSurahId] = useState(null);
   const reciterFilterRef = useRef(null);
+  const { savedIds, downloadStates, downloadAudio, cancelOrRemove } = useOfflineAudio();
 
   const handleCopyLink = useCallback((surah, option) => {
     const params = new URLSearchParams({ surah: surah.id });
@@ -92,6 +95,7 @@ function SurahLibrary({
       return { ...surah, audioOptions: filteredAudioOptions, audioUrl };
     }).filter(surah => {
       if (showOnlyWithAudio && !surah.audioUrl) return false;
+      if (showOfflineOnly && !savedIds[surah.id]) return false;
       if (!searchQuery.trim()) return true;
       const query = searchQuery.toLowerCase();
       const normalizedQuery = normalizeArabic(query);
@@ -101,7 +105,7 @@ function SurahLibrary({
         (surah.nameArabic && normalizeArabic(surah.nameArabic).includes(normalizedQuery))
       );
     });
-  }, [surahs, selectedReciterFilter, showOnlyWithAudio, searchQuery, selectedAudio, getSurahAudioUrl]);
+  }, [surahs, selectedReciterFilter, showOnlyWithAudio, showOfflineOnly, savedIds, searchQuery, selectedAudio, getSurahAudioUrl]);
 
   useEffect(() => {
     onFilteredSurahsChange(filteredSurahs);
@@ -266,29 +270,41 @@ function SurahLibrary({
 
                   <div className="h-px" style={{ background: 'var(--border-subtle)' }} />
 
-                  {/* With audio / Auto play next */}
-                  <div className="flex gap-2">
+                  {/* With audio / Auto play next / Offline only */}
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button
                       onClick={() => setShowOnlyWithAudio(!showOnlyWithAudio)}
-                      className="flex-1 px-3 py-2 rounded-lg text-xs font-brand-mono font-medium transition-all"
+                      className="px-2 py-2 rounded-lg text-xs font-brand-mono font-medium transition-all"
                       style={{
                         background: showOnlyWithAudio ? 'var(--gold-glow)' : 'var(--btn-icon-bg)',
                         color: showOnlyWithAudio ? 'var(--gold)' : 'var(--text-muted)',
                         border: showOnlyWithAudio ? '1px solid var(--active-btn-border)' : '1px solid var(--border-subtle)',
                       }}
                     >
-                      With audio only
+                      Has audio
                     </button>
                     <button
                       onClick={() => onAutoPlayNextChange(!autoPlayNext)}
-                      className="flex-1 px-3 py-2 rounded-lg text-xs font-brand-mono font-medium transition-all"
+                      className="px-2 py-2 rounded-lg text-xs font-brand-mono font-medium transition-all"
                       style={{
                         background: autoPlayNext ? 'var(--gold-glow)' : 'var(--btn-icon-bg)',
                         color: autoPlayNext ? 'var(--gold)' : 'var(--text-muted)',
                         border: autoPlayNext ? '1px solid var(--active-btn-border)' : '1px solid var(--border-subtle)',
                       }}
                     >
-                      Auto play next
+                      Auto next
+                    </button>
+                    <button
+                      onClick={() => setShowOfflineOnly(prev => !prev)}
+                      className="px-2 py-2 rounded-lg text-xs font-brand-mono font-medium transition-all flex items-center justify-center gap-1"
+                      style={{
+                        background: showOfflineOnly ? 'var(--gold-glow)' : 'var(--btn-icon-bg)',
+                        color: showOfflineOnly ? 'var(--gold)' : 'var(--text-muted)',
+                        border: showOfflineOnly ? '1px solid var(--active-btn-border)' : '1px solid var(--border-subtle)',
+                      }}
+                    >
+                      <WifiOff size={11} />
+                      Offline{Object.keys(savedIds).length > 0 ? ` (${Object.keys(savedIds).length})` : ''}
                     </button>
                   </div>
                 </div>
@@ -489,6 +505,43 @@ function SurahLibrary({
                         </button>
 
                         <div className="flex-shrink-0 flex items-center gap-2">
+                          {hasAudio && (() => {
+                            const audioUrl = selectedOption?.url || surah.audioUrl;
+                            const isSaved = savedIds[surah.id] === audioUrl;
+                            const ds = audioUrl ? downloadStates[audioUrl] : undefined;
+                            const isInProgress = ds !== undefined;
+                            return (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!audioUrl) return;
+                                  if (isSaved || isInProgress) cancelOrRemove(surah.id, audioUrl);
+                                  else downloadAudio(surah.id, audioUrl);
+                                }}
+                                className="p-2 rounded-xl transition-all"
+                                style={{
+                                  background: isSaved ? 'var(--replay-active-bg)' : 'var(--btn-icon-bg)',
+                                  color: isSaved ? 'var(--gold)' : 'var(--text-faint)',
+                                  minWidth: '32px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                                aria-label={isSaved ? 'Remove offline copy' : isInProgress ? 'Cancel download' : 'Save for offline'}
+                                title={isSaved ? 'Saved offline — tap to remove' : isInProgress ? 'Cancel' : 'Save for offline'}
+                              >
+                                {isInProgress ? (
+                                  <span className="text-[9px] font-brand-mono leading-none" style={{ color: 'var(--gold)' }}>
+                                    {ds !== null ? `${Math.round(ds * 100)}%` : '…'}
+                                  </span>
+                                ) : isSaved ? (
+                                  <Check size={14} />
+                                ) : (
+                                  <Download size={14} />
+                                )}
+                              </button>
+                            );
+                          })()}
                           {isActive && (
                             <button
                               onClick={(e) => { e.stopPropagation(); handleCopyLink(surah, selectedOption); }}

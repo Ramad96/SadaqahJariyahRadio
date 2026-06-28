@@ -1,7 +1,6 @@
 const SHELL_CACHE = 'sjr-shell-v2';
 const AUDIO_CACHE = 'sjr-audio-v1';
 
-// Activate immediately and take control of all clients
 self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
@@ -16,22 +15,56 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Serve a partial (range) response from a fully-cached audio blob.
+// Without this, audio seeking breaks when served from cache.
+async function serveRangeFromCache(cachedResponse, rangeHeader) {
+  const arrayBuffer = await cachedResponse.clone().arrayBuffer();
+  const total = arrayBuffer.byteLength;
+
+  const [, rawRange] = rangeHeader.split('=');
+  const [startStr, endStr] = rawRange.split('-');
+  const start = parseInt(startStr, 10);
+  const end = endStr ? parseInt(endStr, 10) : total - 1;
+  const chunk = arrayBuffer.slice(start, end + 1);
+
+  return new Response(chunk, {
+    status: 206,
+    statusText: 'Partial Content',
+    headers: {
+      'Content-Type': cachedResponse.headers.get('Content-Type') || 'audio/mpeg',
+      'Content-Range': `bytes ${start}-${end}/${total}`,
+      'Content-Length': String(chunk.byteLength),
+      'Accept-Ranges': 'bytes',
+    },
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
 
-  // Audio files: cache on first fetch, serve from cache on repeat visits
   if (url.pathname.startsWith('/audio_files/')) {
     event.respondWith(
       caches.open(AUDIO_CACHE).then(async (cache) => {
-        const cached = await cache.match(request);
-        if (cached) return cached;
+        // Match ignoring the Range header so we find the full cached entry
+        const cached = await cache.match(request, { ignoreSearch: false });
+
+        if (cached) {
+          const rangeHeader = request.headers.get('Range');
+          if (rangeHeader) return serveRangeFromCache(cached, rangeHeader);
+          return cached;
+        }
+
         try {
           const response = await fetch(request);
-          if (response.ok) cache.put(request, response.clone());
+          if (response.ok) {
+            // Only cache non-range (full) responses
+            if (response.status === 200) {
+              cache.put(request, response.clone());
+            }
+          }
           return response;
         } catch {
           return new Response('Audio not available offline', { status: 503, statusText: 'Offline' });
@@ -41,7 +74,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App shell (HTML, JS, CSS, fonts): network first, fall back to cache
+  // App shell: network first, fall back to cache
   event.respondWith(
     fetch(request)
       .then((response) => {
