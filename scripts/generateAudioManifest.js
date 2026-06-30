@@ -108,18 +108,22 @@ export const audioManifest = {
  * Get clips for a specific surah
  */
 export function getClipsForSurah(surahNumber, surahFolderName) {
-  const baseUrl = import.meta.env.BASE_URL;
   const clips = audioManifest[surahNumber] || [];
+  const supabaseAudioUrl = import.meta.env.VITE_SUPABASE_AUDIO_URL;
 
   return clips.map(clip => {
     const parsed = parseClipFilename(clip.filename);
     if (!parsed) return null;
 
+    const url = supabaseAudioUrl
+      ? \`\${supabaseAudioUrl}/\${surahFolderName}/\${clip.filename}\`
+      : \`\${import.meta.env.BASE_URL}audio_files/\${surahFolderName}/\${clip.filename}\`;
+
     return {
       name: parsed.displayName,
       reciter: parsed.reciter,
       range: parsed.range,
-      url: \`\${baseUrl}audio_files/\${surahFolderName}/\${clip.filename}\`,
+      url,
       isClip: true
     };
   }).filter(Boolean);

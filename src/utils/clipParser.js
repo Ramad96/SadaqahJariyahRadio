@@ -57,15 +57,17 @@ export async function loadClipsForSurah(surahNumber, surahFolderName) {
 export function createClipAudioOption(filename, surahFolderName) {
   const parsed = parseClipFilename(filename);
   if (!parsed) return null;
-  
-  const baseUrl = import.meta.env.BASE_URL;
-  const url = `${baseUrl}audio_files/${surahFolderName}/${filename}`;
-  
+
+  const supabaseAudioUrl = import.meta.env.VITE_SUPABASE_AUDIO_URL;
+  const url = supabaseAudioUrl
+    ? `${supabaseAudioUrl}/${surahFolderName}/${filename}`
+    : `${import.meta.env.BASE_URL}audio_files/${surahFolderName}/${filename}`;
+
   return {
     name: parsed.displayName,
     reciter: parsed.reciter,
     range: parsed.range,
-    url: url,
+    url,
     isClip: true
   };
 }
