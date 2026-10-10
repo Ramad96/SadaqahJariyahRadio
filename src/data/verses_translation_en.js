@@ -353,6 +353,17 @@ export const verses = {
     // Verses needed: 11
     11: "But as for the favor of your Lord, report [it].",
   },
+  95: {
+    // Verses needed: 1, 2, 3, 4, 5, 6, 7, 8
+    1: "By the fig and the olive",
+    2: "And [by] Mount Sinai",
+    3: "And [by] this secure city [i.e., Makkah],",
+    4: "We have certainly created man in the best of stature;",
+    5: "Then We return him to the lowest of the low,",
+    6: "Except for those who believe and do righteous deeds, for they will have a reward uninterrupted.",
+    7: "So what yet causes you to deny the Recompense?",
+    8: "Is not Allāh the most just of judges?",
+  },
   104: {
     // Verses needed: 1, 2, 3, 4, 5, 6, 7, 8, 9
     1: "Woe to every scorner and mocker",

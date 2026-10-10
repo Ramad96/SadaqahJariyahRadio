@@ -216,6 +216,11 @@ export const audioManifest = {
           "filename": "Abdullah1_11-11.mp3"
       }
   ],
+  95: [
+      {
+          "filename": "ShiekhMagdiOsman_1-8.mp3"
+      }
+  ],
   104: [
       {
           "filename": "ShiekhMagdiOsman_1-9.mp3"
